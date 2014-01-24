@@ -1,12 +1,12 @@
 #!/bin/sh
 
-packageName=libaumiks-doc
+packageName=libaudout-doc
 
 baseDir=debian/out/$packageName
 mkdir -p $baseDir
 
 #copy files
-docDir=$baseDir/usr/share/doc/libaumiks
+docDir=$baseDir/usr/share/doc/libaudout
 mkdir -p $docDir
 
 cp docs/index.htm $docDir

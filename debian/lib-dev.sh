@@ -1,10 +1,10 @@
 #!/bin/sh
 
-packageName=libaumiks-dev
+packageName=libaudout-dev
 
 soName=0
 
-libFileName=libaumiks.so
+libFileName=libaudout.so
 
 baseDir=debian/out/$packageName
 mkdir -p $baseDir
@@ -13,9 +13,9 @@ mkdir -p $baseDir
 #copy files
 
 #copy header files
-incDir=$baseDir/usr/include/aumiks
+incDir=$baseDir/usr/include/audout
 mkdir -p $incDir
-cp src/aumiks/*.hpp $incDir
+cp src/audout/*.hpp $incDir
 
 #create symbolic .so link to latest .so name
 libDir=$baseDir/usr/lib
