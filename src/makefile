@@ -102,7 +102,7 @@ endif
 #============================
 ifeq ($(platform), linux)
     libs :=
-    libs += `pkg-config libpulse-simple --libs`
+    libs += `pkg-config libpulse-simple --libs` -lting
 endif
 ifeq ($(platform), windows)
     libs :=
