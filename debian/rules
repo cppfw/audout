@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+build:
+	$(MAKE)
+
+clean:
+	rm -f debian/files
+	rm -rf debian/out
+	$(MAKE) clean
+
+binary:
+	./debian/lib.sh
+	./debian/lib-dbg.sh
+	./debian/lib-dev.sh
+	./debian/lib-doc.sh
+
