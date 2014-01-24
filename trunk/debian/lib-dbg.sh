@@ -2,7 +2,7 @@
 
 soName=0
 
-packageName=libaumiks${soName}-dbg
+packageName=libaudout${soName}-dbg
 
 baseDir=debian/out/$packageName
 mkdir -p $baseDir
@@ -11,7 +11,7 @@ mkdir -p $baseDir
 libDir=$baseDir/usr/lib/debug/usr/lib
 mkdir -p $libDir
 
-libFileName=libaumiks.so
+libFileName=libaudout.so
 
 cp src/$libFileName.$soName $libDir
 
