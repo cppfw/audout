@@ -18,7 +18,7 @@ ifeq ($(platform),macosx)
     remove := rm -rf
 endif
 ifeq ($(platform),linux)
-    libs := ../../src/libaudout.so -lting
+    libs := ../../src/libaudout.so -lting -pthread
     includes :=
     remove := rm -rf
 endif
