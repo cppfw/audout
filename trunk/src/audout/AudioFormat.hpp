@@ -49,6 +49,8 @@ public:
 		}
 		
 		Frame(Type type) : type(type) {}
+		
+		template <Type type> struct Traits;
 	} frame;
 	
 	struct SamplingRate{
@@ -72,6 +74,46 @@ public:
 	{}
 private:
 
+};
+
+
+
+template <> struct AudioFormat::Frame::Traits<AudioFormat::Frame::MONO>{
+	enum NumChannels{
+		NUM_CHANNELS = 1
+	};
+};
+
+
+
+template <> struct AudioFormat::Frame::Traits<AudioFormat::Frame::STEREO>{
+	enum NumChannels{
+		NUM_CHANNELS = 2
+	};
+};
+
+
+
+template <> struct AudioFormat::Frame::Traits<AudioFormat::Frame::QUADRO>{
+	enum NumChannels{
+		NUM_CHANNELS = 4
+	};
+};
+
+
+
+template <> struct AudioFormat::Frame::Traits<AudioFormat::Frame::FIVE_DOT_ONE>{
+	enum NumChannels{
+		NUM_CHANNELS = 6
+	};
+};
+
+
+
+template <> struct AudioFormat::Frame::Traits<AudioFormat::Frame::SEVEN_DOT_ONE>{
+	enum NumChannels{
+		NUM_CHANNELS = 8
+	};
 };
 
 
