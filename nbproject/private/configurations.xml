@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <df root="src" name="1">
+    <df root="src" name="0">
       <df name="audout">
         <df name="backend">
+          <in>ALSABackend.hpp</in>
+          <in>DirectSoundBackend.hpp</in>
+          <in>OpenSLESBackend.hpp</in>
+          <in>PulseAudioBackend.hpp</in>
+          <in>WriteBasedBackend.hpp</in>
         </df>
+        <in>AudioFormat.cpp</in>
+        <in>AudioFormat.hpp</in>
+        <in>Player.cpp</in>
+        <in>Player.hpp</in>
+        <in>PlayerListener.hpp</in>
       </df>
       <df name="obj">
         <df name="1">
@@ -15,8 +25,9 @@
         </df>
       </df>
     </df>
-    <df root="tests" name="2">
+    <df root="tests" name="1">
       <df name="sinesynth">
+        <in>main.cpp</in>
       </df>
     </df>
   </logicalFolder>
