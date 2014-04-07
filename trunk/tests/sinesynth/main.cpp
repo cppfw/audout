@@ -10,7 +10,7 @@ struct SinePlayer : public audout::PlayerListener{
 	audout::AudioFormat format;
 	
 	//override
-	void FillPlayBuf(ting::Buffer<ting::s16>& buf)throw(){
+	void FillPlayBuf(const ting::Buffer<ting::s16>& buf)throw(){
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 
 		for(ting::s16* dst = buf.Begin(); dst != buf.End();){

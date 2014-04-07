@@ -33,7 +33,7 @@ namespace audout{
 //TODO: doxygen
 class PlayerListener{
 public:
-	virtual void FillPlayBuf(ting::Buffer<ting::s16>& playBuf)throw() = 0;
+	virtual void FillPlayBuf(const ting::Buffer<ting::s16>& playBuf)throw() = 0;
 	
 	virtual ~PlayerListener()throw(){}
 };
