@@ -7,6 +7,9 @@
       </df>
     </df>
     <df root="tests" name="1">
+      <df name="sinesynth">
+        <in>main.cpp</in>
+      </df>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -29,7 +32,9 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0" commonFlags="-funsigned-char -fPIC"/>
+        <element flagsID="0"
+                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC -fstack-protector-strong"/>
+        <element flagsID="1" commonFlags="-std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -38,12 +43,9 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE}</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>tests/sinesynth/tests</executablePath>
           <ccTool>
             <standard>8</standard>
-            <incDir>
-              <pElem>src</pElem>
-            </incDir>
           </ccTool>
         </makeTool>
         <preBuild>
@@ -51,8 +53,28 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="src/audout/Player.cpp" ex="false" tool="1" flavor2="0">
+      <folder path="0">
+        <ccTool>
+          <incDir>
+            <pElem>src/audout</pElem>
+            <pElem>src/audout/backend</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="1">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <item path="src/audout/Player.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="tests/sinesynth/main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="1">
         </ccTool>
       </item>
     </conf>

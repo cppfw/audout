@@ -1,54 +1,28 @@
-/* The MIT License:
-
-Copyright (c) 2009-2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://audout.googlecode.com
-
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
 #pragma once
 
-
-
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
+#include "../Exc.hpp"
 #include "WriteBasedBackend.hpp"
 
 
-namespace{
+namespace audout{
 
 class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
 	
-	//override
-	virtual void Write(const ting::Buffer<ting::s16>& buf){
+	void write(const utki::Buf<std::int16_t> buf)override{
 //		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		if(pa_simple_write(
 				this->handle,
-				buf.Begin(),
-				size_t(buf.SizeInBytes()),
+				&*buf.begin(),
+				size_t(buf.sizeInBytes()),
 				0 // no error return
 			) < 0)
 		{
@@ -61,20 +35,20 @@ class PulseAudioBackend : public WriteBasedBackend{
 public:
 	PulseAudioBackend(
 			audout::AudioFormat outputFormat,
-			ting::u32 bufferSizeFrames,
-			audout::PlayerListener* listener
+			std::uint32_t bufferSizeFrames,
+			audout::Listener* listener
 			
 		) :
-			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.frame.NumChannels())
+			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.numChannels())
 	{
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
-		ss.channels = outputFormat.frame.NumChannels();
-		ss.rate = outputFormat.samplingRate.Frequency();
+		ss.channels = outputFormat.numChannels();
+		ss.rate = outputFormat.frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.frame.NumChannels() * 2;//2 bytes per sample, i.e. 16 bit
+		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.numChannels() * 2;//2 bytes per sample, i.e. 16 bit
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -102,14 +76,14 @@ public:
 		if(!this->handle){
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
 			//TODO: more informative error message
-			throw ting::Exc("error opening PulseAudio connection");
+			throw audout::Exc("error opening PulseAudio connection");
 		}
 		
-		this->StartThread();
+		this->startThread();
 	}
 	
 	virtual ~PulseAudioBackend()throw(){
-		this->StopThread();
+		this->stopThread();
 		
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);

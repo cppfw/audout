@@ -1,62 +1,62 @@
-/* The MIT License:
-
-Copyright (c) 2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://audout.googlecode.com
-
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
 #pragma once
 
-#include <ting/types.hpp>
-#include <ting/Buffer.hpp>
-#include <ting/Ptr.hpp>
+#include <utki/config.hpp>
+#include <utki/Singleton.hpp>
 
 #include "AudioFormat.hpp"
-#include "PlayerListener.hpp"
+#include "Listener.hpp"
+
+
+#if M_OS == M_OS_WINDOWS
+#	include "backend/DirectSoundBackend.hpp"
+#elif M_OS == M_OS_LINUX
+#	if M_OS_NAME == M_OS_NAME_ANDROID
+#		include "backend/OpenSLESBackend.hpp"
+#	else
+#		include "backend/PulseAudioBackend.hpp"
+//#		include "backend/ALSABackend.hpp"
+#	endif
+#else
+#	error "Unknown OS"
+#endif
+
 
 namespace audout{
 
 //TODO: doxygen
-class Player {
-	PlayerListener* listener;
+class Player : public utki::IntrusiveSingleton<Player>{
+	friend class utki::IntrusiveSingleton<Player>;
+	static utki::IntrusiveSingleton<Player>::T_Instance instance;
 	
-private:
-	Player(const Player&);
-	Player& operator=(const Player&);
+#if M_OS == M_OS_WINDOWS
+	DirectSoundBackend backend;
+#elif M_OS == M_OS_LINUX
+#	if M_OS_NAME == M_OS_NAME_ANDROID
+	OpenSLESBackend backend;
+#	else
+	PulseAudioBackend backend;
+//	ALSABackend backend;
+#	endif
+#else
+#	error "undefined OS"
+#endif
+
 	
-protected:
-	Player(PlayerListener* listener);
-	
-	inline PlayerListener* Listener()throw(){
-		return this->listener;
-	}
 public:
-	virtual ~Player()throw();
+	Player(AudioFormat outputFormat, std::uint32_t bufSizeInFrames, Listener* listener) :
+			backend(outputFormat, bufSizeInFrames, listener)
+	{}
 	
-	virtual void SetPaused(bool pause) = 0;
+public:
+	virtual ~Player()noexcept{}
 	
-	static ting::Ptr<Player> CreatePlayer(AudioFormat outputFormat, ting::u32 bufSizeInFrames, PlayerListener* listener);
+	void setPaused(bool pause){
+		this->backend.setPaused(pause);
+	}
 };
 
 }//~namespace

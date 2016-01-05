@@ -1,111 +1,83 @@
-/* The MIT License:
-
-Copyright (c) 2011-2014 Ivan Gagis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-
-// Home page: http://audout.googlecode.com
-
 /**
  * @author Ivan Gagis <igagis@gmail.com>
  */
 
 #pragma once
 
-#include <ting/mt/MsgThread.hpp>
-#include <ting/Array.hpp>
+#include <nitki/MsgThread.hpp>
 
 #include "../Player.hpp"
-#include "../PlayerListener.hpp"
+#include "../Listener.hpp"
 
 
-namespace{
+namespace audout{
 
-class WriteBasedBackend : public audout::Player, private ting::mt::MsgThread{
-	ting::Array<ting::s16> playBuf;
+class WriteBasedBackend : private nitki::MsgThread{
+	audout::Listener* listener;
+	
+	std::vector<std::int16_t> playBuf;
+	
 protected:
-	ting::Inited<bool, true> isPaused;
+	bool isPaused = true;
 	
 	WriteBasedBackend(
-			audout::PlayerListener* listener,
+			audout::Listener* listener,
 			size_t playBufSizeInSamples
 		) :
-			audout::Player(listener),
+			listener(listener),
 			playBuf(playBufSizeInSamples)
 	{}
 	
-	inline void StopThread()throw(){
-		this->PushPreallocatedQuitMessage();
-		this->Join();
+	void stopThread()throw(){
+		this->pushPreallocatedQuitMessage();
+		this->join();
 	}
 	
-	inline void StartThread(){
-		this->Thread::Start();
+	void startThread(){
+		this->Thread::start();
 	}
 	
-	virtual void Write(const ting::Buffer<ting::s16>& buf) = 0;
+	virtual void write(const utki::Buf<std::int16_t> buf) = 0;
 	
 public:
-	virtual ~WriteBasedBackend()throw(){}
+	virtual ~WriteBasedBackend()noexcept{}
 	
 private:
 	
-	//override
-	void Run(){
+	void run()override{
+		pogodi::WaitSet ws(1);
+		
+		ws.add(this->queue, pogodi::Waitable::READ);
+		
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
 			
 			if(this->isPaused){
-				this->queue.GetMsg()->Handle();
+				ws.wait();
+				
+				auto m = this->queue.peekMsg();
+				ASSERT(m)
+				m();
 				continue;
 			}
 			
-			while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
-				m->Handle();
+			while(auto m = this->queue.peekMsg()){
+				m();
 			}
 
-			this->Listener()->FillPlayBuf(this->playBuf);
+			this->listener->fillPlayBuf(utki::wrapBuf(this->playBuf));
 			
-			this->Write(this->playBuf);
+			this->write(utki::wrapBuf(this->playBuf));
 		}//~while
+		
+		ws.remove(this->queue);
 	}
 	
-	class SetPausedMessage : public ting::mt::Message{
-		WriteBasedBackend &wbe;
-		bool pause;
-	public:
-		SetPausedMessage(WriteBasedBackend &wbe, bool pause) :
-				wbe(wbe),
-				pause(pause)
-		{}
-		
-		//override
-		void Handle(){
-			this->wbe.isPaused = this->pause;
-		}
-	};
-	
-	//override
-	virtual void SetPaused(bool pause){
-		this->PushMessage(ting::Ptr<ting::mt::Message>(
-				new SetPausedMessage(*this, pause)
-			));
+public:
+	void setPaused(bool pause){
+		this->pushMessage([this, pause](){
+			this->isPaused = pause;
+		});
 	}
 };
 
