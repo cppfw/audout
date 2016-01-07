@@ -1,6 +1,5 @@
-libaudout (0.1.0-1) unstable; urgency=low
+libaudout (0.1.0-1) stable; urgency=low
 
   * Initial release
 
- -- Ivan Gagis <igagis@gmail.com>  Fri, 24 Jan 2014 16:24:18 +0200
-
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 07 Jan 2016 14:06:00 +0200
