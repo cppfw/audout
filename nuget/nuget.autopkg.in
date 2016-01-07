@@ -1,0 +1,53 @@
+nuget{
+	nuspec{
+		id = audout;
+		version : $(version).1; //increase this trailing number if this file has changed to generate a new version of the NuGet package
+		title: C++ audio library;
+		authors: {Ivan Gagis};
+		owners: {Ivan Gagis};
+		licenseUrl: "https://raw.githubusercontent.com/igagis/audout/master/LICENSE";
+		projectUrl: "https://github.com/igagis/audout";
+		iconUrl: "https://github.com/igagis/audout/blob/master/logo.svg";
+		requireLicenseAcceptance:false;
+		summary: C++ audio library;
+
+		description: @"C++ audio library";
+		releaseNotes: "Initial release";
+		copyright: Copyright 2015 Ivan Gagis;
+		tags: { native};
+	}
+	dependencies {
+		packages : {
+			libutki/1.0.8.5;
+			libnitki/1.0.2.7;
+			libpogodi/1.0.3.2;
+		};
+	}
+	files {
+		include: { "..\src\**\*.hpp" };
+		
+		[x86,release] { 
+			lib: ..\msvs_solution\Release\audout.lib;
+//			symbols: ..\msvs_solution\Release\audout.pdb;
+//			bin: ..\msvs_solution\Release\audout.dll;
+		}
+
+		[x86,debug] { 
+			lib: ..\msvs_solution\Debug\audout.lib;
+//			symbols: ..\msvs_solution\Debug\audout.pdb;
+//			bin: ..\msvs_solution\Debug\audout.dll;
+		}
+
+		[x64,release] { 
+			lib: ..\msvs_solution\x64\Release\audout.lib;
+//			symbols: ..\msvs_solution\x64\Release\audout.pdb;
+//			bin: ..\msvs_solution\x64\Release\audout.dll;
+		}
+
+		[x64,debug] { 
+			lib: ..\msvs_solution\x64\Debug\audout.lib;
+//			symbols: ..\msvs_solution\x64\Debug\audout.pdb;
+//			bin: ..\msvs_solution\x64\Debug\audout.dll;
+		}  
+	}
+}
