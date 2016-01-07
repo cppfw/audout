@@ -19,16 +19,16 @@ class PulseAudioBackend : public WriteBasedBackend{
 	void write(const utki::Buf<std::int16_t> buf)override{
 //		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
+		int error;
+		
 		if(pa_simple_write(
 				this->handle,
 				&*buf.begin(),
 				size_t(buf.sizeInBytes()),
-				0 // no error return
+				&error
 			) < 0)
 		{
-			//TODO: handle error somehow, throw exception
-			//ignore error
-			TRACE(<< "pa_simple_write(): error" << std::endl)
+			TRACE(<< "pa_simple_write(): error (" << pa_strerror(error) << ")" << std::endl)
 		}
 	}
 	
@@ -62,10 +62,10 @@ public:
 		int error;
 
 		this->handle = pa_simple_new(
-				0, // Use the default server.
+				nullptr, // Use the default server.
 				"audout", // Our application's name.
 				PA_STREAM_PLAYBACK,
-				0, // Use the default device.
+				nullptr, // Use the default device.
 				"sound stream", // Description of our stream.
 				&ss, // our sample format.
 				&cm, // channel map

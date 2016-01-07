@@ -18,7 +18,6 @@ struct SinePlayer : public audout::Listener{
 			for(unsigned i = 0; i != format.numChannels(); ++i){
 				ASSERT(buf.overlaps(dst))
 				*dst = v;
-				*dst = 0;
 				++dst;
 			}
 		}
