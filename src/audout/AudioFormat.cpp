@@ -7,6 +7,6 @@
 
 #include "AudioFormat.hpp"
 
-using namespace aumiks;
+using namespace audout;
 
 
