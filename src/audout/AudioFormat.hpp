@@ -36,6 +36,10 @@ public:
 	unsigned frequency()const noexcept{
 		return unsigned(this->samplingRate);
 	}
+	
+	unsigned bytesPerFrame()const noexcept{
+		return 2 * numChannels();
+	}
 };
 
 

@@ -17,7 +17,7 @@
 
 #include "../Exc.hpp"
 
-namespace{
+namespace audout{
 
 class ALSABackend : public WriteBasedBackend{
 	struct Device{
@@ -27,7 +27,7 @@ class ALSABackend : public WriteBasedBackend{
 			//Open PCM device for playback.
 			if(snd_pcm_open(&this->handle, "default" /*"hw:0,0"*/, SND_PCM_STREAM_PLAYBACK, 0) < 0){
 //				TRACE(<< "ALSA: unable to open pcm device" << std::endl)
-				throw aumiks::Exc("ALSA: unable to open pcm device");
+				throw audout::Exc("ALSA: unable to open pcm device");
 			}
 		}
 		
@@ -39,9 +39,9 @@ class ALSABackend : public WriteBasedBackend{
 	unsigned bytesPerFrame;
 	
 public:
-	ALSABackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
-			WriteBasedBackend(bufferSizeFrames * aumiks::BytesPerFrame(format)),
-			bytesPerFrame(aumiks::BytesPerFrame(format))
+	ALSABackend(AudioFormat format, unsigned bufferSizeFrames, Listener* listener) :
+			WriteBasedBackend(listener, bufferSizeFrames * format.numChannels()),
+			bytesPerFrame(format.bytesPerFrame())
 	{
 //		TRACE(<< "setting HW params" << std::endl)
 
@@ -53,14 +53,14 @@ public:
 
 		if(snd_pcm_prepare(this->device.handle) < 0){
 //			TRACE(<< "cannot prepare audio interface for use" << std::endl)
-			throw aumiks::Exc("cannot set parameters");
+			throw audout::Exc("cannot set parameters");
 		}
 		
-		this->Start();//start thread
+		this->startThread();
 	}
 
 	virtual ~ALSABackend()throw(){
-		this->StopThread();
+		this->stopThread();
 	}
 
 	int RecoverALSAFromXrun(int err){
@@ -76,7 +76,7 @@ public:
 			return 0;
 		}else if(err == -ESTRPIPE){
 			while((err = snd_pcm_resume(this->device.handle)) == -EAGAIN)
-				ting::Thread::Sleep(100);// wait until the suspend flag is released
+				nitki::Thread::sleep(100);// wait until the suspend flag is released
 			if(err < 0){
 				err = snd_pcm_prepare(this->device.handle);
 				if (err < 0){
@@ -91,11 +91,11 @@ public:
 		return err;
 	}
 
-	//override
-	void Write(const ting::Buffer<ting::u8>& buf){
-		ASSERT(buf.Size() % this->bytesPerFrame == 0)
+
+	void write(const utki::Buf<std::int16_t> buf)override{
+		ASSERT(buf.size() % this->bytesPerFrame == 0)
 		
-		unsigned bufferSizeFrames = buf.Size() / this->bytesPerFrame;
+		unsigned bufferSizeFrames = buf.size() / this->bytesPerFrame;
 		
 		unsigned numFramesWritten = 0;
 		while(numFramesWritten < bufferSizeFrames){
@@ -112,21 +112,21 @@ public:
 				int err = this->RecoverALSAFromXrun(ret);
 				if(err < 0){
 //					LOG(<< "write to audio interface failed, err = " << snd_strerror(err) << std::endl)
-					throw aumiks::Exc("write to audio interface failed");
+					throw audout::Exc("write to audio interface failed");
 				}
 			}
 			numFramesWritten += ret;
 		}
 	}
 
-	void SetHWParams(unsigned bufferSizeFrames, aumiks::E_Format format){
+	void SetHWParams(unsigned bufferSizeFrames, AudioFormat format){
 		struct HwParams{
 			snd_pcm_hw_params_t* params;
 			
 			HwParams(){
 				if(snd_pcm_hw_params_malloc(&this->params) < 0){
 					TRACE(<< "cannot allocate hardware parameter structure" << std::endl)
-					throw aumiks::Exc("cannot allocate hardware parameter structure");
+					throw audout::Exc("cannot allocate hardware parameter structure");
 				}
 			}
 			
@@ -137,30 +137,30 @@ public:
 
 		if(snd_pcm_hw_params_any(this->device.handle, hw.params) < 0){
 			TRACE(<< "cannot initialize hardware parameter structure" << std::endl)
-			throw aumiks::Exc("cannot initialize hardware parameter structure");
+			throw audout::Exc("cannot initialize hardware parameter structure");
 		}
 
 		if(snd_pcm_hw_params_set_access(this->device.handle, hw.params, SND_PCM_ACCESS_RW_INTERLEAVED) < 0){
 			TRACE(<< "cannot set access type" << std::endl)
-			throw aumiks::Exc("cannot set access type");
+			throw audout::Exc("cannot set access type");
 		}
 
 		if(snd_pcm_hw_params_set_format(this->device.handle, hw.params, SND_PCM_FORMAT_S16_LE) < 0){
 			TRACE(<< "cannot set sample format" << std::endl)
-			throw aumiks::Exc("cannot set sample format");
+			throw audout::Exc("cannot set sample format");
 		}
 
 		{
-			unsigned val = aumiks::SamplingRate(format);
+			unsigned val = format.frequency();
 			if(snd_pcm_hw_params_set_rate_near(this->device.handle, hw.params, &val, 0) < 0){
 				TRACE(<< "cannot set sample rate" << std::endl)
-				throw aumiks::Exc("cannot set sample rate");
+				throw audout::Exc("cannot set sample rate");
 			}
 		}
 
-		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, aumiks::SamplesPerFrame(format)) < 0){
+		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, format.numChannels()) < 0){
 			TRACE(<< "cannot set channel count" << std::endl)
-			throw aumiks::Exc("cannot set channel count");
+			throw audout::Exc("cannot set channel count");
 		}
 
 		//Set period size
@@ -176,10 +176,10 @@ public:
 			)
 			{
 				TRACE(<< "could not set period size" << std::endl)
-				throw aumiks::Exc("could not set period size");
+				throw audout::Exc("could not set period size");
 			}
 
-			TRACE(<< "buffer size in samples = " << this->BufferSizeInSamples() << std::endl)
+//			TRACE(<< "buffer size in samples = " << this->BufferSizeInSamples() << std::endl)
 		}
 
 		// Set number of periods. Periods used to be called fragments.
@@ -188,7 +188,7 @@ public:
 			int err = snd_pcm_hw_params_set_periods_near(this->device.handle, hw.params, &numPeriods, NULL);
 			if(err < 0){
 				TRACE(<< "could not set number of periods, err = " << err << std::endl)
-				throw aumiks::Exc("could not set number of periods");
+				throw audout::Exc("could not set number of periods");
 			}
 			TRACE(<< "numPeriods = " << numPeriods << std::endl)
 		}
@@ -197,7 +197,7 @@ public:
 		//set hw params
 		if(snd_pcm_hw_params(this->device.handle, hw.params) < 0){
 			TRACE(<< "cannot set parameters" << std::endl)
-			throw aumiks::Exc("cannot set parameters");
+			throw audout::Exc("cannot set parameters");
 		}
 	}
 
@@ -209,7 +209,7 @@ public:
 			SwParams(){
 				if(snd_pcm_sw_params_malloc(&this->params) < 0){
 					TRACE(<< "cannot allocate software parameters structure" << std::endl)
-					throw aumiks::Exc("cannot allocate software parameters structure");
+					throw audout::Exc("cannot allocate software parameters structure");
 				}
 			}
 			~SwParams(){
@@ -219,24 +219,24 @@ public:
 
 		if(snd_pcm_sw_params_current(this->device.handle, sw.params) < 0){
 			TRACE(<< "cannot initialize software parameters structure" << std::endl)
-			throw aumiks::Exc("cannot initialize software parameters structure");
+			throw audout::Exc("cannot initialize software parameters structure");
 		}
 
 		//tell ALSA to wake us up whenever 'buffer size' frames of playback data can be delivered
 		if(snd_pcm_sw_params_set_avail_min(this->device.handle, sw.params, bufferSizeFrames) < 0){
 			TRACE(<< "cannot set minimum available count" << std::endl)
-			throw aumiks::Exc("cannot set minimum available count");
+			throw audout::Exc("cannot set minimum available count");
 		}
 
 		//tell ALSA to start playing on first data write
 		if(snd_pcm_sw_params_set_start_threshold(this->device.handle, sw.params, 0) < 0){
 			TRACE(<< "cannot set start mode" << std::endl)
-			throw aumiks::Exc("cannot set start mode");
+			throw audout::Exc("cannot set start mode");
 		}
 
 		if(snd_pcm_sw_params(this->device.handle, sw.params) < 0){
 			TRACE(<< "cannot set software parameters" << std::endl)
-			throw aumiks::Exc("cannot set software parameters");
+			throw audout::Exc("cannot set software parameters");
 		}
 	}
 	

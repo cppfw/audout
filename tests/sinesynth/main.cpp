@@ -36,7 +36,7 @@ void play(audout::AudioFormat format){
 	audout::Player p(format, 1000, &pl);
 	p.setPaused(false);
 
-	nitki::Thread::sleep(1000);
+	nitki::Thread::sleep(3000);
 }
 
 

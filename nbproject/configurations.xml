@@ -33,7 +33,7 @@
       </toolsSet>
       <flagsDictionary>
         <element flagsID="0"
-                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC -fstack-protector-strong"/>
+                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC"/>
         <element flagsID="1" commonFlags="-std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
@@ -41,7 +41,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE}</buildCommand>
+          <buildCommand>${MAKE} debug=true</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/sinesynth/tests</executablePath>
           <ccTool>
@@ -58,6 +58,9 @@
           <incDir>
             <pElem>src/audout</pElem>
             <pElem>src/audout/backend</pElem>
+            <pElem>/usr/include/utki</pElem>
+            <pElem>/usr/include/nitki</pElem>
+            <pElem>/usr/include/pogodi</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
@@ -67,6 +70,9 @@
           <incDir>
             <pElem>.</pElem>
           </incDir>
+          <preprocessorList>
+            <Elem>DEBUG</Elem>
+          </preprocessorList>
         </ccTool>
       </folder>
       <item path="src/audout/Player.cpp" ex="false" tool="1" flavor2="8">
