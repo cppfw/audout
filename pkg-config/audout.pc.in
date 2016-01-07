@@ -1,0 +1,9 @@
+Name: morda   # human-readable name
+Description: C++ audio library
+Version: $(version)
+URL: https://github.com/igagis/audout
+Requires:
+Conflicts:
+Libs: -laudout
+Libs.private:
+Cflags:

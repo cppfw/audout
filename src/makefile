@@ -33,7 +33,7 @@ endif
 ifeq ($(prorab_os), linux)
     this_cflags += -fPIC
     this_cflags += `pkg-config --cflags freetype2`
-    this_ldlibs += -lpthread -lX11 -lGL -lGLEW -ljpeg -lpng `pkg-config --libs freetype2` -lz -lstob
+    this_ldlibs += -lpthread
 else ifeq ($(prorab_os), windows)
     this_cflags += -Wno-format #due to bugs in some g++ versions it warns about format when not needed, so disable format warnings
     this_cflags += -I/usr/include -I/usr/local/include/
@@ -60,6 +60,6 @@ else ifeq ($(prorab_os), macosx)
 #    $(eval $(this_rules))
 endif
 
-this_ldlibs += 
+this_ldlibs += -lnitki -lpulse-simple -lpogodi
 
 $(eval $(prorab-build-lib))
