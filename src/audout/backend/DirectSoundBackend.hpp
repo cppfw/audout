@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include <ting/config.hpp>
+#include <utki/config.hpp>
 
 
 #if M_OS != M_OS_WINDOWS
@@ -18,54 +18,52 @@
 #include <initguid.h> //The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
 #include <dsound.h>
 
-#include <ting/WaitSet.hpp>
-#include <ting/Thread.hpp>
+#include <pogodi/WaitSet.hpp>
+#include <nitki/MsgThread.hpp>
 
 #include "../Player.hpp"
+#include "../Exc.hpp"
 
 
+namespace audout{
 
-namespace{
-
-class WinEvent : public ting::Waitable{
+class WinEvent : public pogodi::Waitable{
 	HANDLE eventForWaitable;
 
-	ting::u32 flagsMask;//flags to wait for
+	std::uint32_t flagsMask;//flags to wait for
 
 	//override
-	virtual void SetWaitingEvents(ting::u32 flagsToWaitFor){
+	virtual void SetWaitingEvents(std::uint32_t flagsToWaitFor){
 		//Only possible flag values are READ and 0 (NOT_READY)
-		if(flagsToWaitFor != 0 && flagsToWaitFor != ting::Waitable::READ){
+		if(flagsToWaitFor != 0 && flagsToWaitFor != pogodi::Waitable::READ){
 			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
-			throw ting::Exc("WinEvent::SetWaitingEvents(): flagsToWaitFor should be ting::Waitable::READ or 0, other values are not allowed");
+			throw audout::Exc("WinEvent::SetWaitingEvents(): flagsToWaitFor should be ting::Waitable::READ or 0, other values are not allowed");
 		}
 
 		this->flagsMask = flagsToWaitFor;
 	}
 
-	//returns true if signaled
-	//override
-	virtual bool CheckSignalled(){
+	bool checkSignaled()override{
 		switch(WaitForSingleObject(this->eventForWaitable, 0)){
 			case WAIT_OBJECT_0: //event is signaled
-				this->SetCanReadFlag();
+				this->setCanReadFlag();
 				if(ResetEvent(this->eventForWaitable) == 0){
 					ASSERT(false)
-					throw ting::Exc("WinEvent::Reset(): ResetEvent() failed");
+					throw audout::Exc("WinEvent::Reset(): ResetEvent() failed");
 				}
 				break;
 			case WAIT_TIMEOUT: //event is not signalled
-				this->ClearCanReadFlag();
+				this->clearCanReadFlag();
 				break;
 			default:
-				throw ting::Exc("WinEvent: error when checking event state, WaitForSingleObject() failed");
+				throw audout::Exc("WinEvent: error when checking event state, WaitForSingleObject() failed");
 		}
 		
 		return (this->readinessFlags & this->flagsMask) != 0;
 	}
 public:
-	//override
-	HANDLE GetHandle(){
+
+	HANDLE getHandle()override{
 		return this->eventForWaitable;
 	}
 	
@@ -77,34 +75,36 @@ public:
 			0 //no name
 		);
 		if(this->eventForWaitable == 0){
-			throw ting::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
+			throw audout::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
 		}
 	}
 	
-	virtual ~WinEvent()throw{
+	virtual ~WinEvent()noexcept{
 		CloseHandle(this->eventForWaitable);
 	}
 };
 
 
 
-class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
+class DirectSoundBackend : public nitki::MsgThread{
+	Listener* listener;
+
 	struct DirectSound{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
 		DirectSound(){
 			if(DirectSoundCreate8(0, &this->ds, 0) != DS_OK){
-				throw aumiks::Exc("DirectSound object creation failed");
+				throw audout::Exc("DirectSound object creation failed");
 			}
 			
 			try{
 				HWND hwnd = GetDesktopWindow();
 				if(hwnd == 0){
-					throw aumiks::Exc("DirectSound: no foreground window found");
+					throw audout::Exc("DirectSound: no foreground window found");
 				}
 
 				if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
-					throw aumiks::Exc("DirectSound: setting cooperative level failed");
+					throw audout::Exc("DirectSound: setting cooperative level failed");
 				}
 			}catch(...){
 				this->ds->Release();
@@ -121,14 +121,14 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 		
 		unsigned halfSize;
 		
-		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, aumiks::E_Format format) :
-				halfSize(aumiks::BytesPerFrame(format) * bufferSizeFrames)
+		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, AudioFormat format) :
+				halfSize(format.bytesPerFrame() * bufferSizeFrames)
 		{
 			WAVEFORMATEX wf;
 			memset(&wf, 0, sizeof(WAVEFORMATEX));
 
-			wf.nChannels = aumiks::SamplesPerFrame(format);
-			wf.nSamplesPerSec = aumiks::SamplingRate(format);
+			wf.nChannels = format.numChannels();
+			wf.nSamplesPerSec = format.frequency();
 
 			wf.wFormatTag = WAVE_FORMAT_PCM;
 			wf.wBitsPerSample = 16;
@@ -144,17 +144,17 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 			dsbdesc.lpwfxFormat = &wf; 
 			
 			if(dsbdesc.dwBufferBytes < DSBSIZE_MIN || DSBSIZE_MAX < dsbdesc.dwBufferBytes){
-				throw aumiks::Exc("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
+				throw audout::Exc("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
 			}
 			
 			{
 				LPDIRECTSOUNDBUFFER dsb1;
 				if(ds.ds->CreateSoundBuffer(&dsbdesc, &dsb1, 0) != DS_OK){
-					throw aumiks::Exc("DirectSound: creating sound buffer failed");
+					throw audout::Exc("DirectSound: creating sound buffer failed");
 				}
 				if(dsb1->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&this->dsb) != DS_OK){
 					dsb1->Release();
-					throw aumiks::Exc("DirectSound: querying sound buffer interface failed");
+					throw audout::Exc("DirectSound: querying sound buffer interface failed");
 				}
 				dsb1->Release();
 			}
@@ -176,7 +176,7 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 					) != DS_OK)
 				{
 					this->dsb->Release();
-					throw aumiks::Exc("DirectSound: locking buffer failed");
+					throw audout::Exc("DirectSound: locking buffer failed");
 				}
 				
 				ASSERT(addr != 0)
@@ -188,7 +188,7 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 				//unlock the buffer
 				if(this->dsb->Unlock(addr, size, 0, 0) != DS_OK){
 					this->dsb->Release();
-					throw aumiks::Exc("DirectSound: unlocking buffer failed");
+					throw audout::Exc("DirectSound: unlocking buffer failed");
 				}
 			}
 			
@@ -202,7 +202,7 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 	
 	WinEvent event1, event2;
 	
-	inline void FillDSBuffer(unsigned partNum){
+	void FillDSBuffer(unsigned partNum){
 		ASSERT(partNum == 0 || partNum == 1)
 		LPVOID addr;
 		DWORD size;
@@ -225,8 +225,7 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 		ASSERT(addr != 0)
 		ASSERT(size == this->dsb.halfSize)
 
-		ting::Buffer<ting::u8> buf(static_cast<ting::u8*>(addr), size);
-		this->FillPlayBuf(buf);
+		this->listener->fillPlayBuf(utki::wrapBuf(static_cast<std::int16_t*>(addr), size / 2));
 
 		//unlock the buffer
 		if(this->dsb.dsb->Unlock(addr, size, 0, 0) != DS_OK){
@@ -235,43 +234,42 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 		}
 	}
 	
-	//override
-	void Run(){
-		ting::WaitSet ws(3);
+	void run()override{
+		pogodi::WaitSet ws(3);
 		
-		ws.Add(&this->queue, ting::Waitable::READ);
-		ws.Add(&this->event1, ting::Waitable::READ);
-		ws.Add(&this->event2, ting::Waitable::READ);
+		ws.add(this->queue, pogodi::Waitable::READ);
+		ws.add(this->event1, pogodi::Waitable::READ);
+		ws.add(this->event2, pogodi::Waitable::READ);
 		
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
 			
-			ws.Wait();
+			ws.wait();
 			
-			if(this->queue.CanRead()){
-				while(ting::Ptr<ting::mt::Message> m = this->queue.PeekMsg()){
-					m->Handle();
+			if(this->queue.canRead()){
+				while(auto m = this->queue.peekMsg()){
+					m();
 				}
 			}
 
 			//if first buffer playing has started, then fill the second one
-			if(this->event1.CanRead()){
+			if(this->event1.canRead()){
 				this->FillDSBuffer(1);
 			}
 			
 			//if second buffer playing has started, then fill the first one
-			if(this->event2.CanRead()){
+			if(this->event2.canRead()){
 				this->FillDSBuffer(0);
 			}
 		}//~while
 		
-		ws.Remove(&this->event2);
-		ws.Remove(&this->event1);
-		ws.Remove(&this->queue);
+		ws.remove(this->event2);
+		ws.remove(this->event1);
+		ws.remove(this->queue);
 	}
 	
-	//override
-	void SetPaused(bool pause){
+public:
+	void setPaused(bool pause){
 		if(pause){
 			this->dsb.dsb->Stop();
 		}else{
@@ -284,7 +282,8 @@ class DirectSoundBackend : public audout::Player, public ting::mt::MsgThread{
 	}
 
 public:
-	DirectSoundBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+	DirectSoundBackend(AudioFormat format, unsigned bufferSizeFrames, Listener* listener) :
+			listener(listener),
 			dsb(this->ds, bufferSizeFrames, format)
 	{
 		//Set notification points
@@ -297,18 +296,18 @@ public:
 					(LPVOID*)&notify
 				) != DS_OK)
 			{
-				throw aumiks::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
+				throw audout::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
 			}
 			
-			ting::StaticBuffer<DSBPOSITIONNOTIFY, 2> pos;
+			std::array<DSBPOSITIONNOTIFY, 2> pos;
 			pos[0].dwOffset = 0;
-			pos[0].hEventNotify = this->event1.GetHandle();
+			pos[0].hEventNotify = this->event1.getHandle();
 			pos[1].dwOffset = this->dsb.halfSize;
-			pos[1].hEventNotify = this->event2.GetHandle();
+			pos[1].hEventNotify = this->event2.getHandle();
 			
-			if(notify->SetNotificationPositions(pos.Size(), pos.Begin()) != DS_OK){
+			if(notify->SetNotificationPositions(pos.size(), &*pos.begin()) != DS_OK){
 				notify->Release();
-				throw aumiks::Exc("DirectSound: setting notification positions failed");
+				throw audout::Exc("DirectSound: setting notification positions failed");
 			}
 			
 			//release IID_IDirectSoundNotify interface
@@ -316,7 +315,7 @@ public:
 		}
 		
 		//start playing thread
-		this->Start();
+		this->start();
 		
 		//launch buffer playing
 		if(this->dsb.dsb->Play(
@@ -325,7 +324,7 @@ public:
 				DSBPLAY_LOOPING
 			) != DS_OK)
 		{
-			throw aumiks::Exc("DirectSound: failed to play buffer, Play() method failed");
+			throw audout::Exc("DirectSound: failed to play buffer, Play() method failed");
 		}
 	}
 	
@@ -336,8 +335,8 @@ public:
 		}
 		
 		//Stop playing thread
-		this->PushQuitMessage();
-		this->Join();
+		this->pushQuitMessage();
+		this->join();
 	}
 };
 
