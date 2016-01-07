@@ -28,7 +28,7 @@ protected:
 			playBuf(playBufSizeInSamples)
 	{}
 	
-	void stopThread()throw(){
+	void stopThread()noexcept{
 		this->pushPreallocatedQuitMessage();
 		this->join();
 	}
@@ -53,6 +53,7 @@ private:
 //			TRACE(<< "Backend loop" << std::endl)
 			
 			if(this->isPaused){
+//				TRACE(<< "Backend loop paused" << std::endl)
 				ws.wait();
 				
 				auto m = this->queue.peekMsg();

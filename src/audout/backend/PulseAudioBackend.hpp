@@ -48,7 +48,7 @@ public:
 		ss.channels = outputFormat.numChannels();
 		ss.rate = outputFormat.frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.numChannels() * 2;//2 bytes per sample, i.e. 16 bit
+		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.bytesPerFrame();
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -75,14 +75,13 @@ public:
 
 		if(!this->handle){
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
-			//TODO: more informative error message
 			throw audout::Exc("error opening PulseAudio connection");
 		}
 		
 		this->startThread();
 	}
 	
-	virtual ~PulseAudioBackend()throw(){
+	virtual ~PulseAudioBackend()noexcept{
 		this->stopThread();
 		
 		ASSERT(this->handle)

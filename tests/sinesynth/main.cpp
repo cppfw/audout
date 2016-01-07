@@ -13,11 +13,12 @@ struct SinePlayer : public audout::Listener{
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){
-			std::int16_t v = std::int16_t(float(0x7fff) * std::sin(this->time * utki::twoPi<float>() * 880.0f));
+			std::int16_t v = std::int16_t(float(0x7fff) * std::sin(this->time * utki::twoPi<float>() * 220.0f));
 			this->time += 1 / float(format.frequency());
 			for(unsigned i = 0; i != format.numChannels(); ++i){
 				ASSERT(buf.overlaps(dst))
 				*dst = v;
+				*dst = 0;
 				++dst;
 			}
 		}

@@ -38,7 +38,7 @@ public:
 	}
 	
 	unsigned bytesPerFrame()const noexcept{
-		return 2 * numChannels();
+		return 2 * this->numChannels();
 	}
 };
 
