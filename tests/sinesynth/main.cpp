@@ -13,7 +13,7 @@ struct SinePlayer : public audout::Listener{
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){
-			std::int16_t v = float(0x7fff) * std::sin(this->time * utki::twoPi<float>() * 440.0f);
+			std::int16_t v = float(0x7fff) * std::sin(this->time * utki::twoPi<float>() * 880.0f);
 			this->time += 1 / float(format.frequency());
 			for(unsigned i = 0; i != format.numChannels(); ++i){
 				ASSERT(buf.overlaps(dst))
@@ -71,6 +71,16 @@ int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_44100));
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
+		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_48000));
+	}
+	
+	{
+		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 48000" << std::endl)
+		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_48000));
 	}
 	
 	return 0;

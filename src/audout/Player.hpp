@@ -17,8 +17,8 @@
 #	if M_OS_NAME == M_OS_NAME_ANDROID
 #		include "backend/OpenSLESBackend.hpp"
 #	else
-//#		include "backend/PulseAudioBackend.hpp"
-#		include "backend/ALSABackend.hpp"
+#		include "backend/PulseAudioBackend.hpp"
+//#		include "backend/ALSABackend.hpp"
 #	endif
 #else
 #	error "Unknown OS"
@@ -38,8 +38,8 @@ class Player : public utki::IntrusiveSingleton<Player>{
 #	if M_OS_NAME == M_OS_NAME_ANDROID
 	OpenSLESBackend backend;
 #	else
-//	PulseAudioBackend backend;
-	ALSABackend backend;
+	PulseAudioBackend backend;
+//	ALSABackend backend;
 #	endif
 #else
 #	error "undefined OS"

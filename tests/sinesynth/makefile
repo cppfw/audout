@@ -34,7 +34,7 @@ else ifeq ($(prorab_os),linux)
     this_ldlibs += $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension)
 endif
 
-this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple -lasound
+this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple #-lasound
 
 
 $(eval $(prorab-build-app))
