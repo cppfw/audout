@@ -69,10 +69,10 @@ public:
 	
 	WinEvent(){
 		this->eventForWaitable = CreateEvent(
-			0, //security attributes
+			nullptr, //security attributes
 			TRUE, //manual-reset
 			FALSE, //not signaled initially
-			0 //no name
+			nullptr //no name
 		);
 		if(this->eventForWaitable == 0){
 			throw audout::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
@@ -93,13 +93,13 @@ class DirectSoundBackend : public nitki::MsgThread{
 		LPDIRECTSOUND8 ds;//LP prefix means long pointer
 		
 		DirectSound(){
-			if(DirectSoundCreate8(0, &this->ds, 0) != DS_OK){
+			if(DirectSoundCreate8(nullptr, &this->ds, nullptr) != DS_OK){
 				throw audout::Exc("DirectSound object creation failed");
 			}
 			
 			try{
 				HWND hwnd = GetDesktopWindow();
-				if(hwnd == 0){
+				if(!hwnd){
 					throw audout::Exc("DirectSound: no foreground window found");
 				}
 
@@ -149,7 +149,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 			
 			{
 				LPDIRECTSOUNDBUFFER dsb1;
-				if(ds.ds->CreateSoundBuffer(&dsbdesc, &dsb1, 0) != DS_OK){
+				if(ds.ds->CreateSoundBuffer(&dsbdesc, &dsb1, nullptr) != DS_OK){
 					throw audout::Exc("DirectSound: creating sound buffer failed");
 				}
 				if(dsb1->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&this->dsb) != DS_OK){
@@ -170,7 +170,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 						0, //ignored because of the DSBLOCK_ENTIREBUFFER flag
 						&addr,
 						&size,
-						0, //wraparound not needed
+						nullptr, //wraparound not needed
 						0, //size of wraparound not needed
 						DSBLOCK_ENTIREBUFFER
 					) != DS_OK)
@@ -186,7 +186,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 				memset(addr, 0, size);
 				
 				//unlock the buffer
-				if(this->dsb->Unlock(addr, size, 0, 0) != DS_OK){
+				if(this->dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
 					this->dsb->Release();
 					throw audout::Exc("DirectSound: unlocking buffer failed");
 				}
@@ -195,7 +195,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 			this->dsb->SetCurrentPosition(0);
 		}
 		
-		~DirectSoundBuffer()throw(){
+		~DirectSoundBuffer()noexcept{
 			this->dsb->Release();
 		}
 	} dsb;
@@ -213,7 +213,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 				this->dsb.halfSize, //size
 				&addr,
 				&size,
-				0, //wraparound not needed
+				nullptr, //wraparound not needed
 				0, //size of wraparound not needed
 				0 //no flags
 			) != DS_OK)
@@ -228,7 +228,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 		this->listener->fillPlayBuf(utki::wrapBuf(static_cast<std::int16_t*>(addr), size / 2));
 
 		//unlock the buffer
-		if(this->dsb.dsb->Unlock(addr, size, 0, 0) != DS_OK){
+		if(this->dsb.dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
 			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
 			ASSERT(false)
 		}
@@ -328,7 +328,7 @@ public:
 		}
 	}
 	
-	~DirectSoundBackend()throw(){
+	~DirectSoundBackend()noexcept{
 		//stop buffer playing
 		if(this->dsb.dsb->Stop() != DS_OK){
 			ASSERT(false)
