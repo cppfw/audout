@@ -11,7 +11,6 @@
 #include "../AudioFormat.hpp"
 #include "../Listener.hpp"
 
-//#include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 
 namespace audout{
