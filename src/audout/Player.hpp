@@ -20,6 +20,8 @@
 #		include "backend/PulseAudioBackend.hpp"
 //#		include "backend/ALSABackend.hpp"
 #	endif
+#elif M_OS == M_OS_MACOSX
+#	include "backend/AppleCoreaudioBackend.hpp"
 #else
 #	error "Unknown OS"
 #endif
@@ -41,6 +43,8 @@ class Player : public utki::IntrusiveSingleton<Player>{
 	PulseAudioBackend backend;
 //	ALSABackend backend;
 #	endif
+#elif M_OS == M_OS_MACOSX
+	AppleCoreaudioBackend backend;
 #else
 #	error "undefined OS"
 #endif

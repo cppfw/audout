@@ -37,7 +37,6 @@ public:
 			audout::AudioFormat outputFormat,
 			std::uint32_t bufferSizeFrames,
 			audout::Listener* listener
-			
 		) :
 			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.numChannels())
 	{

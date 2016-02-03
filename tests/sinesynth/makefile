@@ -30,11 +30,13 @@ ifeq ($(prorab_os),windows)
 #    this_cflags += -D__STDC_FORMAT_MACROS
 else ifeq ($(prorab_os),macosx)
 #    this_ldlibs += $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension) -lGLEW -framework OpenGL -framework Cocoa -lpng -ljpeg -lfreetype
+    this_ldlibs += $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension)
 else ifeq ($(prorab_os),linux)
+    this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple #-lasound
     this_ldlibs += $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension)
 endif
 
-this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple #-lasound
+this_ldlibs += 
 
 
 $(eval $(prorab-build-app))

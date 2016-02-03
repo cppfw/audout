@@ -32,7 +32,7 @@ endif
 
 ifeq ($(prorab_os), linux)
     this_cflags += -fPIC
-    this_ldlibs += -lpthread
+    this_ldlibs += -lpthread -lnitki -lpulse-simple -lpogodi
 else ifeq ($(prorab_os), windows)
     this_cflags += -Wno-format #due to bugs in some g++ versions it warns about format when not needed, so disable format warnings
     this_cflags += -I/usr/include -I/usr/local/include/
@@ -47,18 +47,8 @@ else ifeq ($(prorab_os), macosx)
     this_cflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++
     #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
-    
-    #this_mm_obj := $(prorab_this_dir)$(prorab_obj_dir)morda/glue/macosx/main.o
-
-    #define this_rules
-    #    $(this_mm_obj): $(prorab_this_dir)morda/glue/macosx/main.mm
-#		@echo Compiling $$<...
-#		$(prorab_echo)mkdir -p $$(dir $$@)
-#		$(prorab_echo)$(CC) -ObjC++ -std=c++11 -c -o "$$@" $(this_objcflags) $$<
-#    endef
-#    $(eval $(this_rules))
 endif
 
-this_ldlibs += -lnitki -lpulse-simple -lpogodi
+this_ldlibs += 
 
 $(eval $(prorab-build-lib))

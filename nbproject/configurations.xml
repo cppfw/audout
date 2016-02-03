@@ -3,6 +3,9 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="src" name="0">
       <df name="audout">
+        <df name="backend">
+          <in>AppleCoreaudioBackend.hpp</in>
+        </df>
         <in>Player.cpp</in>
       </df>
     </df>
@@ -63,6 +66,11 @@
       <item path="src/audout/Player.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
+      </item>
+      <item path="src/audout/backend/AppleCoreaudioBackend.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="tests/sinesynth/main.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
