@@ -17,10 +17,10 @@
 namespace audout{
 
 class AppleCoreaudioBackend{
-	
+
 	struct AudioComponent{
 		AudioComponentInstance instance;
-		
+
 		AudioComponent(){
 			//open the default audio device
 			AudioComponentDescription desc;
@@ -39,70 +39,36 @@ class AppleCoreaudioBackend{
 				throw audout::Exc("Failed to open default audio device");
 			}
 		}
-		
+
 		~AudioComponent()noexcept{
 			AudioComponentInstanceDispose(this->instance);
 		}
 	} audioComponent;
-	
+
 	static OSStatus outputCallback(
 			void *inRefCon,
-			AudioUnitRenderActionFlags * ioActionFlags,
-			const AudioTimeStamp * inTimeStamp,
-			UInt32 inBusNumber, UInt32 inNumberFrames,
-			AudioBufferList * ioData
+			AudioUnitRenderActionFlags *ioActionFlags,
+			const AudioTimeStamp *inTimeStamp,
+			UInt32 inBusNumber,
+			UInt32 inNumberFrames,
+			AudioBufferList *ioData
 		)
 	{
-		/*
-		SDL_AudioDevice *this = (SDL_AudioDevice *) inRefCon;
-		AudioBuffer *abuf;
-		UInt32 remaining, len;
-		void *ptr;
-		UInt32 i;
+		auto listener = reinterpret_cast<Listener*>(inRefCon);
 
-		//Only do anything if audio is enabled and not paused
-		if (!this->enabled || this->paused) {
-			for (i = 0; i < ioData->mNumberBuffers; i++) {
-				abuf = &ioData->mBuffers[i];
-				SDL_memset(abuf->mData, this->spec.silence, abuf->mDataByteSize);
-			}
-			return 0;
+		for(unsigned i = 0; i != ioData->mNumberBuffers; ++i){
+			auto& buf = ioData->mBuffers[i];
+//			TRACE(<< "num channels = " << buf.mNumberChannels << std::endl)
+			ASSERT(buf.mDataByteSize % sizeof(std::int16_t) == 0)
+			listener->fillPlayBuf(utki::wrapBuf(
+					reinterpret_cast<std::int16_t*>(buf.mData),
+					buf.mDataByteSize / sizeof(std::int16_t)
+				));
 		}
 
-		// No SDL conversion should be needed here, ever, since we accept
-		// any input format in OpenAudio, and leave the conversion to CoreAudio.
-		
-		//   SDL_assert(!this->convert.needed);
-		//   SDL_assert(this->spec.channels == ioData->mNumberChannels);
-
-		for (i = 0; i < ioData->mNumberBuffers; i++) {
-			abuf = &ioData->mBuffers[i];
-			remaining = abuf->mDataByteSize;
-			ptr = abuf->mData;
-			while (remaining > 0) {
-				if (this->hidden->bufferOffset >= this->hidden->bufferSize) {
-					// Generate the data
-					SDL_LockMutex(this->mixer_lock);
-					(*this->spec.callback)(this->spec.userdata,
-								this->hidden->buffer, this->hidden->bufferSize);
-					SDL_UnlockMutex(this->mixer_lock);
-					this->hidden->bufferOffset = 0;
-				}
-
-				len = this->hidden->bufferSize - this->hidden->bufferOffset;
-				if (len > remaining)
-					len = remaining;
-				SDL_memcpy(ptr, (char *)this->hidden->buffer +
-						   this->hidden->bufferOffset, len);
-				ptr = (char *)ptr + len;
-				remaining -= len;
-				this->hidden->bufferOffset += len;
-			}
-		}
-*/
 		return 0;
 	}
-	
+
 public:
 	AppleCoreaudioBackend(
 			audout::AudioFormat outputFormat,
@@ -113,7 +79,7 @@ public:
 		if(AudioUnitInitialize(this->audioComponent.instance)){
 			throw audout::Exc("Failed to initialize audio unit instance");
 		}
-		
+
 		AudioStreamBasicDescription formatDesc;
 		formatDesc.mSampleRate = outputFormat.frequency();
 		formatDesc.mFormatID = kAudioFormatLinearPCM;
@@ -123,7 +89,7 @@ public:
 		formatDesc.mBitsPerChannel = 16;
 		formatDesc.mBytesPerFrame = formatDesc.mChannelsPerFrame * 2;
 		formatDesc.mBytesPerPacket = formatDesc.mBytesPerFrame;
-		
+
 		if(AudioUnitSetProperty(
 				this->audioComponent.instance,
 				kAudioUnitProperty_StreamFormat,
@@ -135,12 +101,12 @@ public:
 		{
 			throw audout::Exc("Failed to set audio unit input property");
 		}
-		
+
 		AURenderCallbackStruct callback;
 		memset(&callback, 0, sizeof(callback));
 		callback.inputProc = &outputCallback;
 		callback.inputProcRefCon = listener;
-		
+
 		if(AudioUnitSetProperty(
 				this->audioComponent.instance,
 				kAudioUnitProperty_SetRenderCallback,
@@ -152,14 +118,14 @@ public:
 		{
 			throw audout::Exc("Unable to attach an IOProc to the selected audio unit");
 		}
-		
+
 		this->setPaused(false);
 	}
-	
+
 	~AppleCoreaudioBackend()noexcept{
 		this->setPaused(true);
 	}
-	
+
 	void setPaused(bool paused){
 		if(paused){
 			AudioOutputUnitStop(this->audioComponent.instance);
