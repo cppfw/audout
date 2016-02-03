@@ -46,7 +46,6 @@ else ifeq ($(prorab_os), windows)
 else ifeq ($(prorab_os), macosx)
     this_cflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++
-    #this_ldlibs += -framework Cocoa -framework OpenGL -lpng -lfreetype -ljpeg -lstob -lGLEW
 endif
 
 this_ldlibs += 
