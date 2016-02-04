@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <utki/config.hpp>
+
 #include "../Exc.hpp"
 #include "../AudioFormat.hpp"
 #include "../Listener.hpp"
@@ -24,7 +26,11 @@ class AppleCoreaudioBackend{
 			//open the default audio device
 			AudioComponentDescription desc;
 			desc.componentType = kAudioUnitType_Output;
+#if M_OS_NAME == M_OS_NAME_IOS
+			desc.componentSubType = kAudioUnitSubType_GenericOutput;
+#else
 			desc.componentSubType = kAudioUnitSubType_DefaultOutput;
+#endif
 			desc.componentFlags = 0;
 			desc.componentFlagsMask = 0;
 			desc.componentManufacturer = kAudioUnitManufacturer_Apple;
