@@ -20,6 +20,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>.travis.yml</itemPath>
       <itemPath>debian/changelog</itemPath>
+      <itemPath>homebrew/libaudout.rb.in</itemPath>
       <itemPath>makefile</itemPath>
     </logicalFolder>
   </logicalFolder>

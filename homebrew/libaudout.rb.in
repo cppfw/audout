@@ -1,0 +1,20 @@
+class Libaudout < Formula
+  desc "C++ cross-platform audio output library."
+  homepage "https://github.com/igagis/audout"
+  url "https://github.com/igagis/audout/archive/$(version).tar.gz"
+  sha256 "$(sha256)"
+
+  depends_on "prorab" => :build
+  depends_on "libutki"
+  
+  def install
+    ENV['PATH'] += ':/usr/local/bin'
+    system "make", "install", "PREFIX=#{prefix}"
+    system "rm", "#{prefix}/bin/tests"
+    system "rm", "#{prefix}/include/dummy.hpp"
+  end
+
+  test do
+    system "make", "test"
+  end
+end
