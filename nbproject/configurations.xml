@@ -21,6 +21,7 @@
       <itemPath>.travis.yml</itemPath>
       <itemPath>ios/Podfile</itemPath>
       <itemPath>debian/changelog</itemPath>
+      <itemPath>cocoapods/libaudout.podspec.in</itemPath>
       <itemPath>homebrew/libaudout.rb.in</itemPath>
       <itemPath>makefile</itemPath>
     </logicalFolder>
