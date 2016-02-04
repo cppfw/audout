@@ -1,3 +1,9 @@
+libaudout (0.2.2) stable; urgency=medium
+
+  * mac and ios support
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 04 Feb 2016 13:03:29 +0200
+
 libaudout (0.2.1) stable; urgency=medium
 
   * fix
