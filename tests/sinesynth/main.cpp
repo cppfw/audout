@@ -36,12 +36,11 @@ void play(audout::AudioFormat format){
 	audout::Player p(format, 1000, &pl);
 	p.setPaused(false);
 
-	nitki::Thread::sleep(3000);
+	nitki::Thread::sleep(2000);
 }
 
 
 int main(int argc, char *argv[]){
-	/*
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_11025));
@@ -72,7 +71,7 @@ int main(int argc, char *argv[]){
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_44100));
 	}
-	*/
+	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_48000));
