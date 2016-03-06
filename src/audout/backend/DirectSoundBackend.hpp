@@ -32,8 +32,8 @@ class WinEvent : public pogodi::Waitable{
 
 	std::uint32_t flagsMask;//flags to wait for
 
-	//override
-	virtual void SetWaitingEvents(std::uint32_t flagsToWaitFor){
+
+	virtual void setWaitingEvents(std::uint32_t flagsToWaitFor)override{
 		//Only possible flag values are READ and 0 (NOT_READY)
 		if(flagsToWaitFor != 0 && flagsToWaitFor != pogodi::Waitable::READ){
 			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
