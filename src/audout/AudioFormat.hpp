@@ -17,6 +17,10 @@ public:
 		SEVEN_DOT_ONE = 8
 	} frame;
 	
+	constexpr static unsigned numChannels(EFrame frameType)noexcept{
+		return unsigned(frameType);
+	}
+	
 	enum class ESamplingRate{
 		HZ_11025 = 11025,
 		HZ_22050 = 22050,
@@ -30,7 +34,7 @@ public:
 	{}
 	
 	unsigned numChannels()const noexcept{
-		return unsigned(this->frame);
+		return numChannels(this->frame);
 	}
 
 	unsigned frequency()const noexcept{

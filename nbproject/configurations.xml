@@ -39,7 +39,7 @@
       </toolsSet>
       <flagsDictionary>
         <element flagsID="0"
-                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC"/>
+                 commonFlags="-mtune=generic -march=x86-64 -std=c++11 -funsigned-char -fPIC -fstack-protector-strong"/>
         <element flagsID="1" commonFlags="-std=c++11"/>
       </flagsDictionary>
       <codeAssistance>
@@ -47,7 +47,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} debug=true</buildCommand>
+          <buildCommand>${MAKE} debug=true CXX=g++-4.9</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/sinesynth/tests</executablePath>
           <ccTool>
@@ -62,12 +62,19 @@
       <folder path="0">
         <ccTool>
           <incDir>
+            <pElem>/usr/include/c++/4.9/bits</pElem>
+            <pElem>/usr/include/c++/4.9</pElem>
             <pElem>src/audout</pElem>
+            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9/bits</pElem>
+            <pElem>/usr/include/c++/4.9/debug</pElem>
+            <pElem>/usr/include/c++/4.9/ext</pElem>
+            <pElem>/usr/lib/gcc/x86_64-linux-gnu/4.9/include</pElem>
             <pElem>src/audout/backend</pElem>
             <pElem>/usr/include/utki</pElem>
             <pElem>/usr/include/pulse</pElem>
             <pElem>/usr/include/nitki</pElem>
             <pElem>/usr/include/pogodi</pElem>
+            <pElem>/usr/include/x86_64-linux-gnu/c++/4.9</pElem>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
