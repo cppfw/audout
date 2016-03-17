@@ -5,7 +5,7 @@
 
 
 struct SinePlayer : public audout::Listener{
-	float time = 0;
+	double time = 0;
 
 	audout::AudioFormat format;
 	
@@ -13,8 +13,8 @@ struct SinePlayer : public audout::Listener{
 //			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){
-			std::int16_t v = std::int16_t(float(0x7fff) * std::sin(this->time * utki::twoPi<float>() * 220.0f));
-			this->time += 1 / float(format.frequency());
+			std::int16_t v = std::int16_t(decltype(this->time)(0x7fff) * std::sin(this->time * utki::twoPi<decltype(this->time)>() * 220.0f));
+			this->time += 1 / decltype(this->time)(format.frequency());
 			for(unsigned i = 0; i != format.numChannels(); ++i){
 				ASSERT(buf.overlaps(dst))
 				*dst = v;
@@ -36,13 +36,11 @@ void play(audout::AudioFormat format){
 	audout::Player p(format, 1000, &pl);
 	p.setPaused(false);
 
-	nitki::Thread::sleep(3000);
-	
+	nitki::Thread::sleep(2000);
 }
 
 
 int main(int argc, char *argv[]){
-	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_11025));
@@ -53,7 +51,7 @@ int main(int argc, char *argv[]){
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_11025));
 	}
-	//TODO:
+	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
 		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_22050));

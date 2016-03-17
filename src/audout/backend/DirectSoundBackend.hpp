@@ -32,8 +32,8 @@ class WinEvent : public pogodi::Waitable{
 
 	std::uint32_t flagsMask;//flags to wait for
 
-	//override
-	virtual void SetWaitingEvents(std::uint32_t flagsToWaitFor){
+
+	virtual void setWaitingEvents(std::uint32_t flagsToWaitFor)override{
 		//Only possible flag values are READ and 0 (NOT_READY)
 		if(flagsToWaitFor != 0 && flagsToWaitFor != pogodi::Waitable::READ){
 			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
@@ -202,7 +202,7 @@ class DirectSoundBackend : public nitki::MsgThread{
 	
 	WinEvent event1, event2;
 	
-	void FillDSBuffer(unsigned partNum){
+	void fillDSBuffer(unsigned partNum){
 		ASSERT(partNum == 0 || partNum == 1)
 		LPVOID addr;
 		DWORD size;
@@ -254,12 +254,12 @@ class DirectSoundBackend : public nitki::MsgThread{
 
 			//if first buffer playing has started, then fill the second one
 			if(this->event1.canRead()){
-				this->FillDSBuffer(1);
+				this->fillDSBuffer(1);
 			}
 			
 			//if second buffer playing has started, then fill the first one
 			if(this->event2.canRead()){
-				this->FillDSBuffer(0);
+				this->fillDSBuffer(0);
 			}
 		}//~while
 		
@@ -318,14 +318,7 @@ public:
 		this->start();
 		
 		//launch buffer playing
-		if(this->dsb.dsb->Play(
-				0, //reserved, must be 0
-				0,
-				DSBPLAY_LOOPING
-			) != DS_OK)
-		{
-			throw audout::Exc("DirectSound: failed to play buffer, Play() method failed");
-		}
+		this->setPaused(false);
 	}
 	
 	~DirectSoundBackend()noexcept{
