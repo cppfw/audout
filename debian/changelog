@@ -1,3 +1,9 @@
+libaudout (0.3.0) stable; urgency=medium
+
+  * refactoring
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 31 Mar 2016 11:14:41 +0300
+
 libaudout (0.2.5) stable; urgency=medium
 
   * constexpr for getting number of channels

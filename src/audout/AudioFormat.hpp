@@ -6,29 +6,32 @@
 
 namespace audout{
 
+enum class Frame_e{
+	MONO = 1,
+	STEREO = 2,
+	QUADRO = 4,
+	FIVE_DOT_ONE = 6,
+	SEVEN_DOT_ONE = 8
+};
 
-class AudioFormat {
+enum class SamplingRate_e{
+	HZ_11025 = 11025,
+	HZ_22050 = 22050,
+	HZ_44100 = 44100,
+	HZ_48000 = 48000
+};
+
+class AudioFormat{
 public:
-	enum class EFrame{
-		MONO = 1,
-		STEREO = 2,
-		QUADRO = 4,
-		FIVE_DOT_ONE = 6,
-		SEVEN_DOT_ONE = 8
-	} frame;
+	Frame_e frame;
 	
-	constexpr static unsigned numChannels(EFrame frameType)noexcept{
+	constexpr static unsigned numChannels(Frame_e frameType)noexcept{
 		return unsigned(frameType);
 	}
 	
-	enum class ESamplingRate{
-		HZ_11025 = 11025,
-		HZ_22050 = 22050,
-		HZ_44100 = 44100,
-		HZ_48000 = 48000
-	} samplingRate;
+	SamplingRate_e samplingRate;
 	
-	AudioFormat(EFrame frame, ESamplingRate samplingRate) :
+	AudioFormat(Frame_e frame, SamplingRate_e samplingRate) :
 			frame(frame),
 			samplingRate(samplingRate)
 	{}

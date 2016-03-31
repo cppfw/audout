@@ -43,43 +43,43 @@ void play(audout::AudioFormat format){
 int main(int argc, char *argv[]){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_11025));
+		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_11025));
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_11025));
+		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_11025));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_22050));
+		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_22050));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_22050));
+		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_22050));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_44100));
+		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_44100));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_44100));
+		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_44100));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::MONO, audout::AudioFormat::ESamplingRate::HZ_48000));
+		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_48000));
 	}
 	
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 48000" << std::endl)
-		play(audout::AudioFormat(audout::AudioFormat::EFrame::STEREO, audout::AudioFormat::ESamplingRate::HZ_48000));
+		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_48000));
 	}
 	
 	return 0;
