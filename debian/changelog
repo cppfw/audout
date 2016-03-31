@@ -1,3 +1,9 @@
+libaudout (0.3.1) stable; urgency=medium
+
+  * Appveyor fix
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 31 Mar 2016 12:00:09 +0300
+
 libaudout (0.3.0) stable; urgency=medium
 
   * refactoring
