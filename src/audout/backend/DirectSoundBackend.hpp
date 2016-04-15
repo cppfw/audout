@@ -305,7 +305,7 @@ public:
 			pos[1].dwOffset = this->dsb.halfSize;
 			pos[1].hEventNotify = this->event2.getHandle();
 			
-			if(notify->SetNotificationPositions(pos.size(), &*pos.begin()) != DS_OK){
+			if(notify->SetNotificationPositions(DWORD(pos.size()), &*pos.begin()) != DS_OK){
 				notify->Release();
 				throw audout::Exc("DirectSound: setting notification positions failed");
 			}
