@@ -1,3 +1,9 @@
+libaudout (0.3.2) stable; urgency=medium
+
+  * nuget fix, adding dummy.hpp
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 15 Apr 2016 23:06:32 +0300
+
 libaudout (0.3.1) stable; urgency=medium
 
   * Appveyor fix
