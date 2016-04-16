@@ -5,6 +5,7 @@ class Libaudout < Formula
   sha256 "$(sha256)"
 
   depends_on "prorab" => :build
+  depends_on "libnitki" => :build
   depends_on "libutki"
   
   def install
