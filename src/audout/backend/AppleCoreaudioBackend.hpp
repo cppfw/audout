@@ -93,7 +93,7 @@ public:
 		formatDesc.mChannelsPerFrame = outputFormat.numChannels();
 		formatDesc.mBitsPerChannel = 16;
 		formatDesc.mBytesPerFrame = formatDesc.mChannelsPerFrame * 2;
-		formatDesc.mBytesPerPacket = formatDesc.mBytesPerFrame;
+		formatDesc.mBytesPerPacket = formatDesc.mBytesPerFrame * formatDesc.mFramesPerPacket;
 
 		if(AudioUnitSetProperty(
 				this->audioComponent.instance,
