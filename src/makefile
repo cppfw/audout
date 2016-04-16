@@ -19,13 +19,11 @@ this_cxxflags += -Wfatal-errors # stop on first error encountered
 this_cxxflags += -fstrict-aliasing #strict aliasing (in order to comply with the c++ standard more strictly)
 this_cxxflags += -g #include debugging symbols
 this_cxxflags += -O3
-                #-P -E #-Wreorder
 this_cxxflags += -std=c++11
 
 
 ifeq ($(debug),true)
     this_cxxflags += -DDEBUG
-#    this_cxxflags += -DM_MORDA_RENDER_WIDGET_BORDERS
     this_objcflags += -DDEBUG
 endif
 
