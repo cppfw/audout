@@ -51,8 +51,15 @@ class Player : public utki::IntrusiveSingleton<Player>{
 
 	
 public:
-	Player(AudioFormat outputFormat, std::uint32_t bufSizeInFrames, Listener* listener) :
-			backend(outputFormat, bufSizeInFrames, listener)
+	/**
+	 * @brief Create a singleton player object.
+	 * @param outputFormat - output format.
+	 * @param requestedBufSizeInFrames - request for size of playing buffer. Note, that it is not guaranteed that
+	 *                                   the size of the resulting buffer will be equal to this requested value.
+	 * @param listener - callback for filling playing buffer.
+	 */
+	Player(AudioFormat outputFormat, std::uint32_t requestedBufSizeInFrames, Listener* listener) :
+			backend(outputFormat, requestedBufSizeInFrames, listener)
 	{}
 	
 public:
