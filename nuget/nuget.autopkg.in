@@ -24,30 +24,30 @@ nuget{
 		};
 	}
 	files {
-		include: { "..\src\**\*.hpp" };
+		//this is needed to put headers in the base folder
+		nestedInclude: {
+			#destination = ${d_include}audout;
+			"..\src\audout\**\*.hpp"
+		};
 		
 		[x86,release] { 
 			lib: ..\msvs_solution\Release\audout.lib;
 			symbols: ..\msvs_solution\audout\Release\audout.pdb;
-//			bin: ..\msvs_solution\Release\audout.dll;
 		}
 
 		[x86,debug] { 
 			lib: ..\msvs_solution\Debug\audout.lib;
 			symbols: ..\msvs_solution\audout\Debug\audout.pdb;
-//			bin: ..\msvs_solution\Debug\audout.dll;
 		}
 
 		[x64,release] { 
 			lib: ..\msvs_solution\x64\Release\audout.lib;
 			symbols: ..\msvs_solution\audout\x64\Release\audout.pdb;
-//			bin: ..\msvs_solution\x64\Release\audout.dll;
 		}
 
 		[x64,debug] { 
 			lib: ..\msvs_solution\x64\Debug\audout.lib;
 			symbols: ..\msvs_solution\audout\x64\Debug\audout.pdb;
-//			bin: ..\msvs_solution\x64\Debug\audout.dll;
 		}  
 	}
 }
