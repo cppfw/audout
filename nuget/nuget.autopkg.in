@@ -13,14 +13,14 @@ nuget{
 
 		description: @"C++ audio library";
 		releaseNotes: "Initial release";
-		copyright: Copyright 2015 Ivan Gagis;
+		copyright: Copyright 2016 Ivan Gagis;
 		tags: { native};
 	}
 	dependencies {
 		packages : {
-			libutki/1.0.8.5;
-			libnitki/1.0.2.7;
-			libpogodi/1.0.3.2;
+			libutki/1.0.22;
+			libnitki/1.0.13;
+			libpogodi/1.0.10;
 		};
 	}
 	files {
@@ -29,25 +29,21 @@ nuget{
 			#destination = ${d_include}audout;
 			"..\src\audout\**\*.hpp"
 		};
-		
-		[x86,release] { 
+
+		[x86,release] {
 			lib: ..\msvs_solution\Release\audout.lib;
-			symbols: ..\msvs_solution\audout\Release\audout.pdb;
 		}
 
-		[x86,debug] { 
+		[x86,debug] {
 			lib: ..\msvs_solution\Debug\audout.lib;
-			symbols: ..\msvs_solution\audout\Debug\audout.pdb;
 		}
 
-		[x64,release] { 
+		[x64,release] {
 			lib: ..\msvs_solution\x64\Release\audout.lib;
-			symbols: ..\msvs_solution\audout\x64\Release\audout.pdb;
 		}
 
-		[x64,debug] { 
+		[x64,debug] {
 			lib: ..\msvs_solution\x64\Debug\audout.lib;
-			symbols: ..\msvs_solution\audout\x64\Debug\audout.pdb;
-		}  
+		}
 	}
 }
