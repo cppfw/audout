@@ -20,7 +20,8 @@ env:
   global:
   #encrypted HOMEBREW_GITHUB_ACCESS_TOKEN for publishing to homebrew-tap
   - secure: "R0GrdfpPxuwMUXDVFtwFyNdOi34CV2o6NlVlLYygtVFtk7YrquB0H/xB+i6Rg/KhVIqOironxWbDUbcBCnVhGbVGMYCd4c90UAcqe6W+dUC70MpsITJXixeNwYr0nn6e09XDIQhlv1gYeGZGQlylJaZhMDwdBSp8Wnxo5jnDTLFpe1mvyOle4V4b3ekVgpEzgulUSsof0GxjN6dTukUEfFusnfOGfNhBeve/mjsWbH5THIfWeYyMn8KAQOH3eO6QHbz42GLExQw1Q7Az1U3ufVzSaG+4keVqmFQ2D2VdAMkXCOU5Ah8nr7yYKTvdkvtPeOjrub+h+/jdkM7dvKjGuC4ArK2tyiDCICypgo8DC87cRPAyPdw+nQzoOH3Gj60Cb/0rSurYviGDIEi57OgznEqHMbiefhTWnCHugZ+ZAhwTXDRvA7uZ/1G96RwiaarJbdZrWRpjSwEdeHLiaIUSFWEV806Pz3dGzDu/poEdBUumFGPum6UlYufQVBvLK26W2SsBbulU/ILPYpb0/cPcuDDGFlNyZfviVS2x5cJpkp0srnY7CEclUp/oESDFyyerDTBUKtduO0ihKhgPNWHJpiwc1368PjHMyIvH0RyXsRBEpKe3Wi722+ajYZF8gh6foe7lmVBfdWhkd78dsxlpcsmGbdipO+8Dq0GjrCDZTRQ="
-  - HOMEBREW_GITHUB_USERNAME=igagis
+  - PRORAB_GIT_USERNAME=igagis
+  - PRORAB_GIT_ACCESS_TOKEN=$HOMEBREW_GITHUB_ACCESS_TOKEN
 
 before_install:
 - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
