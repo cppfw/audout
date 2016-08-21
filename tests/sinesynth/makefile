@@ -37,7 +37,7 @@ else ifeq ($(prorab_os),linux)
     this_ldlibs += $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension)
 endif
 
-this_ldlibs += 
+this_ldlibs += -lstdc++ -lm
 
 
 $(eval $(prorab-build-app))
