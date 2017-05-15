@@ -1,7 +1,3 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
 namespace audout{
@@ -51,4 +47,4 @@ public:
 
 
 
-}//~namespace
+}

@@ -1,8 +1,6 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
+
+#include <vector>
 
 #include <nitki/MsgThread.hpp>
 
@@ -82,4 +80,4 @@ public:
 	}
 };
 
-}//~namespace
+}
