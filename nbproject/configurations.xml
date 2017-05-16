@@ -50,7 +50,7 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} debug=true CXX=g++-4.9</buildCommand>
+          <buildCommand>${MAKE} debug=true</buildCommand>
           <cleanCommand>${MAKE} clean</cleanCommand>
           <executablePath>tests/sinesynth/tests</executablePath>
           <ccTool>

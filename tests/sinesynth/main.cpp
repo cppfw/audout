@@ -10,11 +10,11 @@ struct SinePlayer : public audout::Listener{
 	audout::AudioFormat format;
 	
 	void fillPlayBuf(utki::Buf<std::int16_t> buf)noexcept override{
-//			TRACE_ALWAYS(<< "filling smp buf, freq = " << freq << std::endl)
+//		TRACE_ALWAYS(<< "filling smp buf" << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){
 			std::int16_t v = std::int16_t(
-					decltype(this->time)(0x7fff) * std::sin(this->time * 2 * utki::pi<decltype(this->time)>() * 220.0f)
+					decltype(this->time)(0x7fff) * std::sin(this->time * 2 * utki::pi<decltype(this->time)>() * 110.0f)
 				);
 			this->time += 1 / decltype(this->time)(format.frequency());
 			for(unsigned i = 0; i != format.numChannels(); ++i){
@@ -24,8 +24,8 @@ struct SinePlayer : public audout::Listener{
 			}
 		}
 
-//			TRACE_ALWAYS(<< "time = " << this->time << std::endl)
-//			TRACE(<< "this->smpBuf = " << buf << std::endl)
+//		TRACE_ALWAYS(<< "time = " << this->time << std::endl)
+//		TRACE(<< "this->smpBuf = " << buf << std::endl)
 	}
 	
 	SinePlayer(audout::AudioFormat format) :

@@ -51,9 +51,9 @@ public:
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
-		ba.minreq = bufferSizeInBytes / 2;
-		ba.maxlength = ba.tlength;
-		ba.prebuf = ba.tlength;
+		ba.minreq = std::uint32_t(-1);
+		ba.maxlength = std::uint32_t(-1);
+		ba.prebuf = std::uint32_t(-1);
 		
 		pa_channel_map cm;
 		pa_channel_map_init_auto(&cm, ss.channels, PA_CHANNEL_MAP_WAVEEX);
@@ -88,4 +88,4 @@ public:
 	}
 };
 
-}//~namespace
+}
