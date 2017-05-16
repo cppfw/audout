@@ -1,24 +1,28 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
-#include <ting/Array.hpp>
+#include <vector>
+#include <array>
+
+#include <utki/Exc.hpp>
+#include <utki/util.hpp>
 
 #include <SLES/OpenSLES.h>
 
 #if M_OS_NAME == M_OS_NAME_ANDROID
 #	include <SLES/OpenSLES_Android.h>
+#include <cstdint>
+
 #endif
 
 #include "../Player.hpp"
 
 
-namespace{
+namespace audout{
 
-class OpenSLESBackend : public audout::Player{
-	
+class OpenSLESBackend{
+
+    audout::Listener* listener;
+
 	struct Engine{
 		SLObjectItf object; //object
 		SLEngineItf engine; //Engine interface
@@ -26,33 +30,37 @@ class OpenSLESBackend : public audout::Player{
 		Engine(){
 			//create engine object
 			if(slCreateEngine(&this->object, 0, NULL, 0, NULL, NULL) != SL_RESULT_SUCCESS){
-				throw ting::Exc("OpenSLES: Creating engine object failed");
+				throw utki::Exc("OpenSLES: Creating engine object failed");
 			}
-			
+
+            utki::ScopeExit scopeExit([this](){
+                this->destroy();
+            });
+
 			//realize the engine
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Realizing engine object failed");
+				throw utki::Exc("OpenSLES: Realizing engine object failed");
 			}
 			
 			//get the engine interface, which is needed in order to create other objects
 			if((*this->object)->GetInterface(this->object, SL_IID_ENGINE, &this->engine) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Obtaining Engine interface failed");
+				throw utki::Exc("OpenSLES: Obtaining Engine interface failed");
 			}
+
+            scopeExit.reset();
 		}
 		
-		~Engine()throw(){
-			this->Destroy();
+		~Engine()noexcept{
+			this->destroy();
 		}
 		
-		void Destroy()throw(){
+		void destroy()noexcept{
 			(*this->object)->Destroy(this->object);
 		}
 		
 	private:
-		Engine(const Engine&);
-		Engine& operator=(const Engine&);
+		Engine(const Engine&) = delete;
+		Engine& operator=(const Engine&) = delete;
 	} engine;
 	
 	
@@ -62,27 +70,32 @@ class OpenSLESBackend : public audout::Player{
 		
 		OutputMix(Engine& engine){
 			if((*engine.engine)->CreateOutputMix(engine.engine, &this->object, 0, NULL, NULL) != SL_RESULT_SUCCESS){
-				throw ting::Exc("OpenSLES: Creating output mix object failed");
+				throw utki::Exc("OpenSLES: Creating output mix object failed");
 			}
-			
+
+            utki::ScopeExit scopeExit([this](){
+                this->destroy();
+            });
+
 			// realize the output mix
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Realizing output mix object failed");
+				throw utki::Exc("OpenSLES: Realizing output mix object failed");
 			}
+
+            scopeExit.reset();
 		}
 		
-		~OutputMix()throw(){
-			this->Destroy();
+		~OutputMix()noexcept{
+			this->destroy();
 		}
 		
-		void Destroy()throw(){
+		void destroy()noexcept{
 			(*this->object)->Destroy(this->object);
 		}
 		
 	private:
-		OutputMix(const OutputMix&);
-		OutputMix& operator=(const OutputMix&);
+		OutputMix(const OutputMix&) = delete;
+		OutputMix& operator=(const OutputMix&) = delete;
 	} outputMix;
 	
 	
@@ -98,8 +111,8 @@ class OpenSLESBackend : public audout::Player{
 		SLBufferQueueItf
 #endif
 				bufferQueue;
-		
-		ting::StaticBuffer<ting::Array<ting::u8>, 2> bufs;
+
+        std::array<std::vector<std::uint8_t>, 2> bufs;
 	
 	
 		//this callback handler is called every time a buffer finishes playing
@@ -124,39 +137,45 @@ class OpenSLESBackend : public audout::Player{
 			
 #if M_OS_NAME == M_OS_NAME_ANDROID
 #else
-			ASSERT(buffer == player->bufs[0].Begin())
-			ASSERT(bufferSize == player->bufs[0].Size())
+			ASSERT(buffer == &*player->bufs[0].begin())
+			ASSERT(bufferSize == player->bufs[0].size())
 			ASSERT(dataUsed <= bufferSize)
 #endif
 			
-			ASSERT(player->bufs.Size() == 2)
+			ASSERT(player->bufs.size() == 2)
 			std::swap(player->bufs[0], player->bufs[1]); //swap buffers, the 0th one is the buffer which is currently playing
 			
 #if M_OS_NAME == M_OS_NAME_ANDROID
-			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size());
+			SLresult res = (*queue)->Enqueue(queue, &*player->bufs[0].begin(), player->bufs[0].size());
 #else
-			SLresult res = (*queue)->Enqueue(queue, player->bufs[0].Begin(), player->bufs[0].Size(), SL_BOOLEAN_FALSE);
+			SLresult res = (*queue)->Enqueue(queue, &*player->bufs[0].begin(), player->bufs[0].size(), SL_BOOLEAN_FALSE);
 #endif
 			ASSERT(res == SL_RESULT_SUCCESS)
 			
 			//fill the second buffer to be enqueued next time the callback is called
-			player->backend.FillPlayBuf(player->bufs[1]);
+            ASSERT(player->bufs[1].size() % 2 == 0)
+			player->backend.listener->fillPlayBuf(
+                    utki::Buf<std::int16_t>(
+                            reinterpret_cast<std::int16_t*>(&*player->bufs[1].begin()),
+                            player->bufs[1].size() / 2
+                        )
+                );
 		}
 		
 		
 		
-		Player(OpenSLESBackend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, aumiks::E_Format format) :
+		Player(OpenSLESBackend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, audout::AudioFormat format) :
 				backend(backend)
 		{
 			//Allocate play buffers of required size
 			{
-				size_t bufSize = bufferSizeFrames * aumiks::BytesPerFrame(format);
-				for(ting::Array<ting::u8>* i = this->bufs.Begin(); i != this->bufs.End(); ++i){
-					i->Init(bufSize);
-				}
-				ASSERT(this->bufs.Size() == 2)
+				size_t bufSize = bufferSizeFrames * format.bytesPerFrame();
+                ASSERT(this->bufs.size() == 2)
+                for(auto& b : this->bufs){
+                    b.resize(bufSize);
+                }
 				//Initialize the first buffer with 0's, since playing will start from the first buffer
-				memset(this->bufs[0].Begin(), 0, this->bufs[0].Size());
+				memset(&*this->bufs[0].begin(), 0, this->bufs[0].size());
 			}
 			
 			//========================
@@ -167,7 +186,7 @@ class OpenSLESBackend : public audout::Player{
 			SLDataLocator_BufferQueue bufferQueueStruct = {SL_DATALOCATOR_BUFFERQUEUE, 2}; //2 buffers in queue
 #endif
 			
-			unsigned numChannels = aumiks::SamplesPerFrame(format);
+			unsigned numChannels = format.numChannels();
 			SLuint32 channelMask;
 			switch(numChannels){
 				case 1:
@@ -183,7 +202,7 @@ class OpenSLESBackend : public audout::Player{
 			SLDataFormat_PCM audioFormat = {
 				SL_DATAFORMAT_PCM,
 				numChannels, //number of channels
-				aumiks::SamplingRate(format) * 1000, //milliHertz
+				format.frequency() * 1000, //milliHertz
 				16, //bits per sample, if 16bits then sample is signed 16bit integer
 				16, //container size for sample, it can be bigger than sample itself. E.g. 32bit container for 16bits sample
 				channelMask, //which channels map to which speakers
@@ -212,25 +231,26 @@ class OpenSLESBackend : public audout::Player{
 					req
 				) != SL_RESULT_SUCCESS)
 			{
-				throw ting::Exc("OpenSLES: Creating player object failed");
+				throw utki::Exc("OpenSLES: Creating player object failed");
 			}
-			
+
+            utki::ScopeExit scopeExit([this](){
+                this->destroy();
+            });
+
 			//realize the player
 			if((*this->object)->Realize(this->object, SL_BOOLEAN_FALSE) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Realizing player object failed");
+				throw utki::Exc("OpenSLES: Realizing player object failed");
 			}
 
 			//get the play interface
 			if((*this->object)->GetInterface(this->object, SL_IID_PLAY, &this->play) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Obtaining Play interface failed");
+				throw utki::Exc("OpenSLES: Obtaining Play interface failed");
 			}
 
 			//get the buffer queue interface
 			if((*this->object)->GetInterface(this->object, SL_IID_BUFFERQUEUE, &this->bufferQueue) != SL_RESULT_SUCCESS){
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Obtaining Play interface failed");
+				throw utki::Exc("OpenSLES: Obtaining Play interface failed");
 			}
 
 			//register callback on the buffer queue
@@ -240,16 +260,15 @@ class OpenSLESBackend : public audout::Player{
 					this //context to be passed to the callback
 				) != SL_RESULT_SUCCESS)
 			{
-				this->Destroy();
-				throw ting::Exc("OpenSLES: Registering callback on the buffer queue failed");
+				throw utki::Exc("OpenSLES: Registering callback on the buffer queue failed");
 			}
 		}
 		
-		~Player()throw(){
-			this->Destroy();
+		~Player()noexcept{
+			this->destroy();
 		}
 		
-		void Destroy()throw(){
+		void destroy()noexcept{
 			(*this->object)->Destroy(this->object);
 		}
 		
@@ -257,44 +276,56 @@ class OpenSLESBackend : public audout::Player{
 		Player(const Player&);
 		Player& operator=(const Player&);
 	} player;
-	
-	
 
-	//override
-	void SetPaused(bool pause){
-		if(pause){
-			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
-		}else{
-			(*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
-		}
-	}
-	
+
 public:
+    void setPaused(bool pause){
+        if(pause){
+            (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
+        }else{
+            (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
+        }
+    }
+
 	//create buffered queue player
-	OpenSLESBackend(unsigned bufferSizeFrames, aumiks::E_Format format) :
+	OpenSLESBackend(
+            audout::AudioFormat outputFormat,
+            std::uint32_t bufferSizeFrames,
+            audout::Listener* listener
+        ) :
+            listener(listener),
 			outputMix(this->engine),
-			player(*this, this->engine, this->outputMix, bufferSizeFrames, format)
+			player(*this, this->engine, this->outputMix, bufferSizeFrames, outputFormat)
 	{
 //		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
 		// Set player to playing state
 		if((*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
-			throw ting::Exc("OpenSLES: Setting player state to PLAYING failed");
+			throw utki::Exc("OpenSLES: Setting player state to PLAYING failed");
 		}
 		
 		//Enqueue the first buffer for playing, otherwise it will not start playing
 #if M_OS_NAME == M_OS_NAME_ANDROID
-		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size());
+		SLresult res = (*this->player.bufferQueue)->Enqueue(
+                this->player.bufferQueue,
+                &*this->player.bufs[0].begin(),
+                this->player.bufs[0].size()
+            );
 #else
-		SLresult res = (*this->player.bufferQueue)->Enqueue(this->player.bufferQueue, this->player.bufs[0].Begin(), this->player.bufs[0].Size(), SL_BOOLEAN_FALSE);
+		SLresult res = (*this->player.bufferQueue)->Enqueue(
+		        this->player.bufferQueue,
+		        &*this->player.bufs[0].begin(),
+		        this->player.bufs[0].size(),
+		        SL_BOOLEAN_FALSE
+		    );
 #endif
 		if(res != SL_RESULT_SUCCESS){
-			throw ting::Exc("OpenSLES: unable to enqueue");
+			throw utki::Exc("OpenSLES: unable to enqueue");
 		}
 	}
 
 	
 	
-	~OpenSLESBackend()throw(){
+	~OpenSLESBackend()noexcept{
 		// Stop player playing
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
@@ -303,4 +334,4 @@ public:
 	}
 };
 
-}//~namespace
+}
