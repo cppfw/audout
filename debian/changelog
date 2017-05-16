@@ -1,3 +1,9 @@
+libaudout (0.3.10) unstable; urgency=medium
+
+  * android deployment access token corrected
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 16 May 2017 23:43:34 +0300
+
 libaudout (0.3.9) unstable; urgency=medium
 
   * pulseaudio buffering fix
