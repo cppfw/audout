@@ -299,7 +299,7 @@ public:
 	{
 //		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
 		// Set player to playing state
-		if((*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
+		if((*this->player.play)->SetPlayState(this->player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
 			throw utki::Exc("OpenSLES: Setting player state to PLAYING failed");
 		}
 		

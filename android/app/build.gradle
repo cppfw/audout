@@ -29,7 +29,7 @@ model {
             cppFlags.add("-fexceptions")
             cppFlags.add("-frtti")
             cppFlags.add("-I" + projectDir.getAbsolutePath() + "/build/ndkLibs/include")
-            ldLibs.addAll(['android', 'log'])
+            ldLibs.addAll(['android', 'log', 'OpenSLES'])
             // build a default combined apk including all ABIs.
             // abiFilters.addAll(['x86'])
         }
@@ -41,8 +41,8 @@ model {
                         project ":libaudout" linkage "static"
                     }
                     source {
-                        srcDirs '../../tests'
-                        exclude('**/main.cpp')
+                        srcDirs '../../tests/sinesynth'
+//                        exclude('**/main.cpp')
                     }
                 }
                 jniLibs {
@@ -78,8 +78,8 @@ repositories {
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-//    compile 'io.github.igagis:libutki:+'
-//    compile 'io.github.igagis:libpapki:+'
+    compile 'io.github.igagis:libutki:+'
+    compile 'io.github.igagis:libnitki:+'
 //    compile 'io.github.igagis:libunikod:+'
 }
 
