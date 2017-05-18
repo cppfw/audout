@@ -262,6 +262,8 @@ class OpenSLESBackend{
 			{
 				throw utki::Exc("OpenSLES: Registering callback on the buffer queue failed");
 			}
+
+            scopeExit.reset();
 		}
 		
 		~Player()noexcept{
@@ -271,7 +273,20 @@ class OpenSLESBackend{
 		void destroy()noexcept{
 			(*this->object)->Destroy(this->object);
 		}
-		
+
+        void setPaused(bool pause){
+            SLresult res;
+            if(pause){
+                res = (*this->play)->SetPlayState(this->play, SL_PLAYSTATE_STOPPED);
+            }else{
+                res = (*this->play)->SetPlayState(this->play, SL_PLAYSTATE_PLAYING);
+            }
+
+            if(res != SL_RESULT_SUCCESS){
+                throw utki::Exc("OpenSLES: Setting player state failed");
+            }
+        }
+
 	private:
 		Player(const Player&);
 		Player& operator=(const Player&);
@@ -280,11 +295,7 @@ class OpenSLESBackend{
 
 public:
     void setPaused(bool pause){
-        if(pause){
-            (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
-        }else{
-            (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_PLAYING);
-        }
+        this->player.setPaused(pause);
     }
 
 	//create buffered queue player
@@ -298,10 +309,7 @@ public:
 			player(*this, this->engine, this->outputMix, bufferSizeFrames, outputFormat)
 	{
 //		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
-		// Set player to playing state
-		if((*this->player.play)->SetPlayState(this->player.play, SL_PLAYSTATE_PLAYING) != SL_RESULT_SUCCESS){
-			throw utki::Exc("OpenSLES: Setting player state to PLAYING failed");
-		}
+		this->setPaused(false);
 		
 		//Enqueue the first buffer for playing, otherwise it will not start playing
 #if M_OS_NAME == M_OS_NAME_ANDROID
