@@ -2,7 +2,7 @@ Source: libaudout
 Section: misc
 Priority: extra
 Maintainer: Ivan Gagis <igagis@gmail.com>
-Build-Depends: debhelper (>= 9), prorab, doxygen,
+Build-Depends: debhelper (>= 9), myci, prorab, prorab-extra, doxygen,
 		libc6-dev, libpulse-dev, libutki-dev, libnitki-dev
 Build-Depends-Indep: doxygen
 Standards-Version: 3.9.2
