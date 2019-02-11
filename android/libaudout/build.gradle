@@ -15,8 +15,8 @@ model {
         ndk {
             platformVersion = 21
             moduleName = "audout"
-//            toolchain = 'clang'
-            abiFilters.addAll(['armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64', 'mips', 'mips64']) //this is default
+            toolchain = 'clang'
+            abiFilters.addAll(['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64']) //this is default
             ldLibs.addAll(['android', 'log', 'OpenSLES'])
             stl = 'c++_shared'
             cppFlags.add("-std=c++11")
@@ -25,9 +25,6 @@ model {
             cppFlags.add("-I" + projectDir.getAbsolutePath() + "/build/ndkLibs/include")
         }
         abis {
-            create("armeabi") {
-                ldFlags.add("-L" + projectDir.getAbsolutePath() + "/build/ndkLibs/armeabi")
-            }
             create("armeabi-v7a") {
                 ldFlags.add("-L" + projectDir.getAbsolutePath() + "/build/ndkLibs/armeabi-v7a")
             }
@@ -39,12 +36,6 @@ model {
             }
             create("x86_64") {
                 ldFlags.add("-L" + projectDir.getAbsolutePath() + "/build/ndkLibs/x86_64")
-            }
-            create("mips") {
-                ldFlags.add("-L" + projectDir.getAbsolutePath() + "/build/ndkLibs/mips")
-            }
-            create("mips64") {
-                ldFlags.add("-L" + projectDir.getAbsolutePath() + "/build/ndkLibs/mips64")
             }
         }
     }
