@@ -1,3 +1,9 @@
+libaudout (0.3.16) unstable; urgency=medium
+
+  * deploy to bionic
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 16 Apr 2019 18:12:07 +0300
+
 libaudout (0.3.15) unstable; urgency=medium
 
   * deploy to bionic
