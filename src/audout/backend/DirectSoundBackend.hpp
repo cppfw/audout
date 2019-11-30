@@ -288,7 +288,7 @@ public:
 	{
 		//Set notification points
 		{
-			LPDIRECTSOUNDNOTIFY8 notify;
+			LPDIRECTSOUNDNOTIFY notify;
 			
 			//Get IID_IDirectSoundNotify interface
 			if(this->dsb.dsb->QueryInterface(
