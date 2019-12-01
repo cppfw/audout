@@ -19,14 +19,14 @@ ifeq ($(debug), true)
     this_cxxflags += -DDEBUG
 endif
 
-ifeq ($(prorab_os),windows)
+ifeq ($(os),windows)
 #    this_ldlibs += -lmingw32 #these should go first, otherwise linker will complain about undefined reference to WinMain
     this_ldlibs += $(d)../../src/libaudout$(soext)
-    this_ldlibs +=  -lnitki
-else ifeq ($(prorab_os),macosx)
+    this_ldlibs += -lnitki
+else ifeq ($(os),macosx)
     this_ldlibs += $(d)../../src/libaudout$(soext)
     this_ldlibs += -framework AudioUnit
-else ifeq ($(prorab_os),linux)
+else ifeq ($(os),linux)
     this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple #-lasound
     this_ldlibs += $(d)../../src/libaudout$(soext)
 endif
@@ -40,26 +40,26 @@ $(eval $(prorab-build-app))
 define this_rules
 test:: $(prorab_this_name)
 	@echo running $$^...
-	@(cd $(prorab_this_dir); LD_LIBRARY_PATH=../../src $$^)
+	@(cd $(d); LD_LIBRARY_PATH=../../src $$^)
 endef
 $(eval $(this_rules))
 
 
 #add dependency on libaudout
 ifeq ($(prorab_os),windows)
-    $(prorab_this_dir)libaudout$(prorab_lib_extension): $(abspath $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension))
+    $(d)libaudout$(soext): $(abspath $(d)../../src/libaudout$(soext))
 	@cp $< $@
 
-    $(prorab_this_name): $(prorab_this_dir)libaudout$(prorab_lib_extension)
+    $(prorab_this_name): $(d)libaudout$(soext)
 
     define this_rules
         clean::
-		@rm -f $(prorab_this_dir)libaudout$(prorab_lib_extension)
+		@rm -f $(d)libaudout$(soext)
     endef
     $(eval $(this_rules))
 else
-    $(prorab_this_name): $(abspath $(prorab_this_dir)../../src/libaudout$(prorab_lib_extension))
+    $(prorab_this_name): $(abspath $(d)../../src/libaudout$(soext))
 endif
 
 
-$(eval $(call prorab-include,$(prorab_this_dir)../../src/makefile))
+$(eval $(call prorab-include,$(d)../../src/makefile))

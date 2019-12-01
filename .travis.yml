@@ -147,10 +147,6 @@ script:
     fi;
   fi
 
-
-before_deploy:
-  - myci-apply-version.sh -v `myci-deb-version.sh debian/changelog` travis_bintray_*.json.in
-
 deploy:
 - provider: script
   skip_cleanup: true
