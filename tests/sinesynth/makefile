@@ -62,4 +62,4 @@ else
 endif
 
 
-$(eval $(call prorab-include,$(d)../../src/makefile))
+$(eval $(call prorab-try-include,$(d)../../src/makefile))
