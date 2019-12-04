@@ -20,9 +20,8 @@ ifeq ($(debug), true)
 endif
 
 ifeq ($(os),windows)
-#    this_ldlibs += -lmingw32 #these should go first, otherwise linker will complain about undefined reference to WinMain
     this_ldlibs += $(d)../../src/libaudout$(soext)
-    this_ldlibs += -lnitki
+    this_ldlibs += -lnitki -lpogodi -ldsound
 else ifeq ($(os),macosx)
     this_ldlibs += $(d)../../src/libaudout$(soext)
     this_ldlibs += -framework AudioUnit
