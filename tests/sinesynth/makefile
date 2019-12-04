@@ -37,9 +37,12 @@ $(eval $(prorab-build-app))
 
 
 define this_rules
-test:: $(prorab_this_name)
-	@echo running $$^...
-	@(cd $(d); LD_LIBRARY_PATH=../../src $$^)
+run:: $(prorab_this_name)
+$(.RECIPEPREFIX)@echo running $$^...
+$(.RECIPEPREFIX)$(Q)(cd $(d); LD_LIBRARY_PATH=../../src $$^)
+
+test::
+
 endef
 $(eval $(this_rules))
 
