@@ -1,3 +1,9 @@
+libaudout (0.3.19) unstable; urgency=medium
+
+  * debian buster
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 05 Dec 2019 00:46:26 +0200
+
 libaudout (0.3.18) unstable; urgency=medium
 
   * deployment fix
