@@ -33,6 +33,7 @@ endif
 
 this_ldlibs += -lstdc++ -lm
 
+this_no_install := true
 
 $(eval $(prorab-build-app))
 
