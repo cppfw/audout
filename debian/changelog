@@ -1,3 +1,9 @@
+libaudout (0.3.22) unstable; urgency=medium
+
+  * update to libs
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 09 Jan 2020 00:18:51 +0200
+
 libaudout (0.3.21) unstable; urgency=medium
 
   * do not install test app
