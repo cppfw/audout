@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utki/config.hpp>
-#include <utki/Singleton.hpp>
+#include <utki/singleton.hpp>
 
 #include "AudioFormat.hpp"
 #include "Listener.hpp"
@@ -26,9 +26,9 @@
 namespace audout{
 
 //TODO: doxygen
-class Player : public utki::IntrusiveSingleton<Player>{
-	friend class utki::IntrusiveSingleton<Player>;
-	static utki::IntrusiveSingleton<Player>::T_Instance instance;
+class Player : public utki::intrusive_singleton<Player>{
+	friend class utki::intrusive_singleton<Player>;
+	static utki::intrusive_singleton<Player>::T_Instance instance;
 	
 #if M_OS == M_OS_WINDOWS
 	DirectSoundBackend backend;
