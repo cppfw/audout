@@ -1,25 +1,18 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
-
 #include <utki/config.hpp>
-
 
 #if M_OS != M_OS_WINDOWS
 #	error "compiling in non-Windows environment"
 #endif
 
-
 #include <cstring>
+#include <thread>
 
-#include <initguid.h> //The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
+#include <initguid.h> // The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
 #include <dsound.h>
 
-#include <pogodi/WaitSet.hpp>
-#include <nitki/MsgThread.hpp>
+#include <opros/wait_set.hpp>
 
 #include "../Player.hpp"
 #include "../Exc.hpp"
@@ -27,55 +20,56 @@
 
 namespace audout{
 
-class WinEvent : public pogodi::Waitable{
+class WinEvent : public opros::waitable{
 	HANDLE eventForWaitable;
 
-	std::uint32_t flagsMask;//flags to wait for
+	utki::flags<opros::ready> waiting_flags;
 
-
-	virtual void setWaitingEvents(std::uint32_t flagsToWaitFor)override{
-		//Only possible flag values are READ and 0 (NOT_READY)
-		if(flagsToWaitFor != 0 && flagsToWaitFor != pogodi::Waitable::READ){
-			ASSERT_INFO(false, "flagsToWaitFor = " << flagsToWaitFor)
-			throw audout::Exc("WinEvent::SetWaitingEvents(): flagsToWaitFor should be ting::Waitable::READ or 0, other values are not allowed");
+	virtual void set_waiting_flags(utki::flags<opros::ready> wait_for)override{
+		// Only possible flag values are 'read' or 0 (not ready)
+		if(!(wait_for & (~utki::make_flags({opros::ready::read}))).is_clear()){
+			ASSERT_INFO(false, "wait_for = " << wait_for)
+			throw audout::Exc("WinEvent::set_waiting_flags(): only 'read' or no flags are allowed");
 		}
 
-		this->flagsMask = flagsToWaitFor;
+		this->waiting_flags = wait_for;
 	}
 
-	bool checkSignaled()override{
+	bool check_signaled()override{
 		switch(WaitForSingleObject(this->eventForWaitable, 0)){
-			case WAIT_OBJECT_0: //event is signaled
-				this->setCanReadFlag();
+			case WAIT_OBJECT_0: // event is signaled
+				this->readiness_flags.set(opros::ready::read);
 				if(ResetEvent(this->eventForWaitable) == 0){
 					ASSERT(false)
-					throw audout::Exc("WinEvent::Reset(): ResetEvent() failed");
+					throw std::system_error(GetLastError(), std::generic_category(), "ResetEvent() failed");
 				}
 				break;
-			case WAIT_TIMEOUT: //event is not signalled
-				this->clearCanReadFlag();
+			case WAIT_ABANDONED:
+			case WAIT_TIMEOUT: // event is not signalled
+				this->readiness_flags.clear(opros::ready::read);
 				break;
 			default:
-				throw audout::Exc("WinEvent: error when checking event state, WaitForSingleObject() failed");
+			case WAIT_FAILURE:
+				throw std::system_error(GetLastError(), std::generic_category(), "WaitForSingleObject() failed");
 		}
 		
-		return (this->readinessFlags & this->flagsMask) != 0;
+		return !(this->waiting_flags & this->flags()).is_clear();
 	}
 public:
 
-	HANDLE getHandle()override{
+	HANDLE get_handle()override{
 		return this->eventForWaitable;
 	}
 	
 	WinEvent(){
 		this->eventForWaitable = CreateEvent(
-			nullptr, //security attributes
-			TRUE, //manual-reset
-			FALSE, //not signaled initially
-			nullptr //no name
+			nullptr, // security attributes
+			TRUE, // manual-reset
+			FALSE, // not signaled initially
+			nullptr // no name
 		);
 		if(this->eventForWaitable == 0){
-			throw audout::Exc("WinEvent::WinEvent(): could not create event (Win32) for implementing Waitable");
+			throw std::system_error(GetLastError(), std::generic_category(), "CreateEvent() failed");
 		}
 	}
 	
@@ -86,42 +80,49 @@ public:
 
 
 
-class DirectSoundBackend : public nitki::MsgThread{
+class DirectSoundBackend{
 	Listener* listener;
 
-	struct DirectSound{
-		LPDIRECTSOUND8 ds;//LP prefix means long pointer
+	std::thread thread;
+
+	nitki::queue queue;
+
+	bool quitFlag = false;
+
+	struct direct_sound{
+		LPDIRECTSOUND8 ds; // LP prefix means long pointer
 		
-		DirectSound(){
+		direct_sound(){
 			if(DirectSoundCreate8(nullptr, &this->ds, nullptr) != DS_OK){
-				throw audout::Exc("DirectSound object creation failed");
+				throw std::runtime_error("DirectSoundCreate8() failed");
 			}
 			
-			try{
-				HWND hwnd = GetDesktopWindow();
-				if(!hwnd){
-					throw audout::Exc("DirectSound: no foreground window found");
-				}
-
-				if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
-					throw audout::Exc("DirectSound: setting cooperative level failed");
-				}
-			}catch(...){
+			utki::scope_exit ds_scope_exit([this](){
 				this->ds->Release();
-				throw;
+			});
+
+			HWND hwnd = GetDesktopWindow();
+			if(!hwnd){
+				throw std::runtime_error("no foreground window found");
 			}
+
+			if(this->ds->SetCooperativeLevel(hwnd, DSSCL_PRIORITY) != DS_OK){
+				throw std::runtime_error("SetCooperativeLevel() failed");
+			}
+
+			ds_scope_exit.reset();
 		}
-		~DirectSound()throw(){
+		~direct_sound()noexcept{
 			this->ds->Release();
 		}
 	} ds;
 
-	struct DirectSoundBuffer{
-		LPDIRECTSOUNDBUFFER8 dsb; //LP stands for long pointer
+	struct direct_sound_buffer{
+		LPDIRECTSOUNDBUFFER8 dsb; // LP stands for long pointer
 		
 		unsigned halfSize;
 		
-		DirectSoundBuffer(DirectSound& ds, unsigned bufferSizeFrames, AudioFormat format) :
+		direct_sound_buffer(direct_sound& ds, unsigned bufferSizeFrames, AudioFormat format) :
 				halfSize(format.bytesPerFrame() * bufferSizeFrames)
 		{
 			WAVEFORMATEX wf;
@@ -144,58 +145,60 @@ class DirectSoundBackend : public nitki::MsgThread{
 			dsbdesc.lpwfxFormat = &wf; 
 			
 			if(dsbdesc.dwBufferBytes < DSBSIZE_MIN || DSBSIZE_MAX < dsbdesc.dwBufferBytes){
-				throw audout::Exc("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
+				throw std::invalid_argument("DirectSound: requested buffer size is out of supported size range [DSBSIZE_MIN, DSBSIZE_MAX]");
 			}
 			
 			{
 				LPDIRECTSOUNDBUFFER dsb1;
 				if(ds.ds->CreateSoundBuffer(&dsbdesc, &dsb1, nullptr) != DS_OK){
-					throw audout::Exc("DirectSound: creating sound buffer failed");
+					throw std::runtime_error("DirectSound: CreateSoundBuffer() failed");
 				}
+				utki::scope_exit dsb1_scope_exit([&dsb1](){dsb1->Release();});
+
 				if(dsb1->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&this->dsb) != DS_OK){
-					dsb1->Release();
-					throw audout::Exc("DirectSound: querying sound buffer interface failed");
+					throw std::runtime_error("DirectSound: QueryInterface() failed");
 				}
-				dsb1->Release();
 			}
+
+			utki::scope_exit dsb_scope_exit([this](){this->dsb->Release();});
 			
-			//init buffer with silence, i.e. fill it with 0'es
+			// init buffer with silence, i.e. fill it with 0'es
 			{
 				LPVOID addr;
 				DWORD size;
 				
-				//lock the entire buffer
+				// lock the entire buffer
 				if(this->dsb->Lock(
 						0,
-						0, //ignored because of the DSBLOCK_ENTIREBUFFER flag
+						0, // ignored because of the DSBLOCK_ENTIREBUFFER flag
 						&addr,
 						&size,
-						nullptr, //wraparound not needed
-						0, //size of wraparound not needed
+						nullptr, // wraparound not needed
+						0, // size of wraparound not needed
 						DSBLOCK_ENTIREBUFFER
 					) != DS_OK)
 				{
-					this->dsb->Release();
-					throw audout::Exc("DirectSound: locking buffer failed");
+					throw std::runtime_error("DirectSound: buffer Lock() failed");
 				}
 				
 				ASSERT(addr != 0)
 				ASSERT(size == 2 * this->halfSize)
 				
-				//set buffer to 0'es
+				// set buffer to 0'es
 				memset(addr, 0, size);
 				
-				//unlock the buffer
+				// unlock the buffer
 				if(this->dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
-					this->dsb->Release();
-					throw audout::Exc("DirectSound: unlocking buffer failed");
+					throw std::runtime_error("DirectSound: buffer Unlock() failed");
 				}
 			}
 			
 			this->dsb->SetCurrentPosition(0);
+
+			dsb_scope_exit.reset();
 		}
 		
-		~DirectSoundBuffer()noexcept{
+		~direct_sound_buffer()noexcept{
 			this->dsb->Release();
 		}
 	} dsb;
@@ -207,15 +210,15 @@ class DirectSoundBackend : public nitki::MsgThread{
 		LPVOID addr;
 		DWORD size;
 
-		//lock the second part of buffer
+		// lock the second part of buffer
 		if(this->dsb.dsb->Lock(
-				this->dsb.halfSize * partNum, //offset
-				this->dsb.halfSize, //size
+				this->dsb.halfSize * partNum, // offset
+				this->dsb.halfSize, // size
 				&addr,
 				&size,
-				nullptr, //wraparound not needed
-				0, //size of wraparound not needed
-				0 //no flags
+				nullptr, // wraparound not needed
+				0, // size of wraparound not needed
+				0 // no flags
 			) != DS_OK)
 		{
 			TRACE(<< "DirectSound thread: locking buffer failed" << std::endl)
@@ -225,43 +228,43 @@ class DirectSoundBackend : public nitki::MsgThread{
 		ASSERT(addr != 0)
 		ASSERT(size == this->dsb.halfSize)
 
-		this->listener->fillPlayBuf(utki::wrapBuf(static_cast<std::int16_t*>(addr), size / 2));
+		this->listener->fillPlayBuf(utki::make_span(static_cast<std::int16_t*>(addr), size / 2));
 
-		//unlock the buffer
+		// unlock the buffer
 		if(this->dsb.dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
 			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
 			ASSERT(false)
 		}
 	}
 	
-	void run()override{
-		pogodi::WaitSet ws(3);
+	void run(){
+		opros::wait_set ws(3);
 		
-		ws.add(this->queue, pogodi::Waitable::READ);
-		ws.add(this->event1, pogodi::Waitable::READ);
-		ws.add(this->event2, pogodi::Waitable::READ);
+		ws.add(this->queue, {opros::ready::read});
+		ws.add(this->event1, {opros::ready::read});
+		ws.add(this->event2, {opros::ready::read});
 		
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
 			
 			ws.wait();
 			
-			if(this->queue.canRead()){
-				while(auto m = this->queue.peekMsg()){
+			if(this->queue.flags().get(opros::ready::read)){
+				while(auto m = this->queue.pop_front()){
 					m();
 				}
 			}
 
-			//if first buffer playing has started, then fill the second one
-			if(this->event1.canRead()){
+			// if first buffer playing has started, then fill the second one
+			if(this->event1.flags().get(opros::ready::read)){
 				this->fillDSBuffer(1);
 			}
 			
-			//if second buffer playing has started, then fill the first one
-			if(this->event2.canRead()){
+			// if second buffer playing has started, then fill the first one
+			if(this->event2.flags().get(opros::ready::read)){
 				this->fillDSBuffer(0);
 			}
-		}//~while
+		}
 		
 		ws.remove(this->event2);
 		ws.remove(this->event1);
@@ -274,7 +277,7 @@ public:
 			this->dsb.dsb->Stop();
 		}else{
 			this->dsb.dsb->Play(
-					0, //reserved, must be 0
+					0, // reserved, must be 0
 					0,
 					DSBPLAY_LOOPING
 				);
@@ -286,51 +289,49 @@ public:
 			listener(listener),
 			dsb(this->ds, bufferSizeFrames, format)
 	{
-		//Set notification points
+		// set notification points
 		{
 			LPDIRECTSOUNDNOTIFY notify;
 			
-			//Get IID_IDirectSoundNotify interface
+			// get IID_IDirectSoundNotify interface
 			if(this->dsb.dsb->QueryInterface(
 					IID_IDirectSoundNotify8,
 					(LPVOID*)&notify
 				) != DS_OK)
 			{
-				throw audout::Exc("DirectSound: obtaining IID_IDirectSoundNotify interface failed");
+				throw std::runtime_error("DirectSound: QueryInterface(IID_IDirectSoundNotify8) failed");
 			}
 			
+			utki::scope_exit notify_scope_exit([&notify](){notify->Release();});
+
 			std::array<DSBPOSITIONNOTIFY, 2> pos;
 			pos[0].dwOffset = 0;
-			pos[0].hEventNotify = this->event1.getHandle();
+			pos[0].hEventNotify = this->event1.get_handle();
 			pos[1].dwOffset = this->dsb.halfSize;
-			pos[1].hEventNotify = this->event2.getHandle();
+			pos[1].hEventNotify = this->event2.get_handle();
 			
-			if(notify->SetNotificationPositions(DWORD(pos.size()), &*pos.begin()) != DS_OK){
-				notify->Release();
-				throw audout::Exc("DirectSound: setting notification positions failed");
+			if(notify->SetNotificationPositions(DWORD(pos.size()), pos.data()) != DS_OK){
+				throw std::runtime_error("DirectSound: SetNotificationPositions() failed");
 			}
-			
-			//release IID_IDirectSoundNotify interface
-			notify->Release();
 		}
 		
-		//start playing thread
-		this->start();
+		// start playing thread
+		this->thread = std::thread([this](){this->run();});
 		
-		//launch buffer playing
+		// launch buffer playing
 		this->setPaused(false);
 	}
 	
 	~DirectSoundBackend()noexcept{
-		//stop buffer playing
+		// stop buffer playing
 		if(this->dsb.dsb->Stop() != DS_OK){
 			ASSERT(false)
 		}
 		
-		//Stop playing thread
-		this->pushQuitMessage();
-		this->join();
+		// stop playing thread
+		this->queue.push_back([this](){this->quitFlag = true;});
+		this->thread.join();
 	}
 };
 
-}//~namespace
+}
