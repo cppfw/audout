@@ -49,7 +49,7 @@ class WinEvent : public opros::waitable{
 				this->readiness_flags.clear(opros::ready::read);
 				break;
 			default:
-			case WAIT_FAILURE:
+			case WAIT_FAILED:
 				throw std::system_error(GetLastError(), std::generic_category(), "WaitForSingleObject() failed");
 		}
 		
@@ -329,6 +329,7 @@ public:
 		}
 		
 		// stop playing thread
+		ASSERT(this->thread.joinable())
 		this->queue.push_back([this](){this->quitFlag = true;});
 		this->thread.join();
 	}

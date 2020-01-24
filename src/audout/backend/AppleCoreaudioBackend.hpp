@@ -1,10 +1,3 @@
-/* 
- * File:   AppleCoreaudioBackend.hpp
- * Author: ivan
- *
- * Created on February 3, 2016, 9:36 PM
- */
-
 #pragma once
 
 #include <utki/config.hpp>

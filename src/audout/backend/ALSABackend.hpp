@@ -1,15 +1,6 @@
-/*
- * audout 0.1
- *
- * File:   ALSA.hpp
- * Author: ivan
- *
- * Created on March 9, 2009, 3:22 PM
- */
-
 #pragma once
 
-// Use the newer ALSA API
+// use the newer ALSA API
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 
@@ -24,7 +15,7 @@ class ALSABackend : public WriteBasedBackend{
 		snd_pcm_t *handle;
 		
 		Device(){
-			//Open PCM device for playback.
+			// open PCM device for playback
 			if(snd_pcm_open(&this->handle, "default" /*"hw:0,0"*/, SND_PCM_STREAM_PLAYBACK, 0) < 0){
 //				TRACE(<< "ALSA: unable to open pcm device" << std::endl)
 				throw audout::Exc("ALSA: unable to open pcm device");
