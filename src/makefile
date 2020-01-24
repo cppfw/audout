@@ -30,9 +30,9 @@ endif
 
 ifeq ($(os), linux)
     this_cxxflags += -fPIC
-    this_ldlibs += -lpthread -lnitki -lpulse-simple -lpogodi
+    this_ldlibs += -lpthread -lnitki -lpulse-simple -lopros
 else ifeq ($(os), windows)
-    this_ldlibs += -lnitki -lpogodi -lstdc++
+    this_ldlibs += -lnitki -lopros -lstdc++
 else ifeq ($(os), macosx)
     this_cxxflags += -stdlib=libc++ #this is needed to be able to use c++11 std lib
     this_ldlibs += -lc++

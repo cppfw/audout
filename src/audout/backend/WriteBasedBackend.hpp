@@ -1,8 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <thread>
 
-#include <nitki/MsgThread.hpp>
+#include <nitki/queue.hpp>
 
 #include "../Player.hpp"
 #include "../Listener.hpp"
@@ -10,11 +11,17 @@
 
 namespace audout{
 
-class WriteBasedBackend : private nitki::MsgThread{
+class WriteBasedBackend{
 	audout::Listener* listener;
 	
 	std::vector<std::int16_t> playBuf;
 	
+	nitki::queue queue;
+
+	bool quitFlag = false;
+
+	std::thread thread;
+
 protected:
 	bool isPaused = true;
 	
@@ -27,12 +34,14 @@ protected:
 	{}
 	
 	void stopThread()noexcept{
-		this->pushPreallocatedQuitMessage();
-		this->join();
+		if(this->thread.joinable()){
+			this->queue.push_back([this](){this->quitFlag = true;});
+			this->thread.join();
+		}
 	}
 	
 	void startThread(){
-		this->Thread::start();
+		this->thread = std::thread([this](){this->run();});
 	}
 	
 	virtual void write(const utki::Buf<std::int16_t> buf) = 0;
@@ -42,10 +51,10 @@ public:
 	
 private:
 	
-	void run()override{
-		pogodi::WaitSet ws(1);
+	void run(){
+		opros::wait_set ws(1);
 		
-		ws.add(this->queue, pogodi::Waitable::READ);
+		ws.add(this->queue, {opros::ready::read});
 		
 		while(!this->quitFlag){
 //			TRACE(<< "Backend loop" << std::endl)
@@ -67,14 +76,14 @@ private:
 			this->listener->fillPlayBuf(utki::wrapBuf(this->playBuf));
 			
 			this->write(utki::wrapBuf(this->playBuf));
-		}//~while
+		}
 		
 		ws.remove(this->queue);
 	}
 	
 public:
 	void setPaused(bool pause){
-		this->pushMessage([this, pause](){
+		this->queue.push_back([this, pause](){
 			this->isPaused = pause;
 		});
 	}

@@ -21,12 +21,12 @@ endif
 
 ifeq ($(os),windows)
     this_ldlibs += $(d)../../src/libaudout$(soext)
-    this_ldlibs += -lnitki -lpogodi -ldsound
+    this_ldlibs += -lnitki -lopros -ldsound
 else ifeq ($(os),macosx)
     this_ldlibs += $(d)../../src/libaudout$(soext)
     this_ldlibs += -framework AudioUnit
 else ifeq ($(os),linux)
-    this_ldlibs += -lpogodi -lnitki -lpthread -lpulse -lpulse-simple #-lasound
+    this_ldlibs += -lopros -lnitki -lpthread -lpulse -lpulse-simple #-lasound
     this_ldlibs += $(d)../../src/libaudout$(soext)
 endif
 
@@ -35,7 +35,6 @@ this_ldlibs += -lstdc++ -lm
 this_no_install := true
 
 $(eval $(prorab-build-app))
-
 
 define this_rules
 run:: $(prorab_this_name)
@@ -47,22 +46,19 @@ test::
 endef
 $(eval $(this_rules))
 
+ifeq ($(os),windows)
+    $(d)libaudout$(dot_so): $(abspath $(d)../../src/libaudout$(dot_so))
+$(.RECIPEPREFIX)$(Q)cp $< $@
 
-#add dependency on libaudout
-ifeq ($(prorab_os),windows)
-    $(d)libaudout$(soext): $(abspath $(d)../../src/libaudout$(soext))
-	@cp $< $@
-
-    $(prorab_this_name): $(d)libaudout$(soext)
+    $(prorab_this_name): $(d)libaudout$(dot_so)
 
     define this_rules
         clean::
-		@rm -f $(d)libaudout$(soext)
+$(.RECIPEPREFIX)$(Q)rm -f $(d)libaudout$(dot_so)
     endef
     $(eval $(this_rules))
 else
-    $(prorab_this_name): $(abspath $(d)../../src/libaudout$(soext))
+    $(prorab_this_name): $(abspath $(d)../../src/libaudout$(dot_so))
 endif
 
-
-$(eval $(call prorab-try-include,$(d)../../src/makefile))
+$(eval $(call prorab-include, ../../src/makefile))
