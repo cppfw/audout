@@ -5,9 +5,9 @@ this_name := tests
 this_srcs := main.cpp
 
 this_cxxflags += -Wall
-this_cxxflags += -Wno-comment #no warnings on nested comments
+this_cxxflags += -Wno-comment # no warnings on nested comments
 this_cxxflags += -Werror
-this_cxxflags += -fstrict-aliasing #strict aliasing!!!
+this_cxxflags += -fstrict-aliasing
 this_cxxflags += -g
 this_cxxflags += -std=c++11
 
@@ -18,14 +18,14 @@ else
 endif
 
 ifeq ($(os),windows)
-    this_ldlibs += $(d)../../src/libaudout$(dot_so)
+    this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
     this_ldlibs += -lnitki -lopros -ldsound
 else ifeq ($(os),macosx)
-    this_ldlibs += $(d)../../src/libaudout$(dot_so)
+    this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
     this_ldlibs += -framework AudioUnit
 else ifeq ($(os),linux)
     this_ldlibs += -lopros -lnitki -lpthread -lpulse -lpulse-simple #-lasound
-    this_ldlibs += $(d)../../src/libaudout$(dot_so)
+    this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
 endif
 
 this_ldlibs += -lstdc++ -lm
@@ -34,36 +34,29 @@ this_no_install := true
 
 $(eval $(prorab-build-app))
 
-define this_rules
+
+ifeq ($(os),windows)
+    this_run_cmd := (cd $(d) && cmd //C 'set PATH=../../src/build;%PATH% && $$(notdir $$^)')
+else ifeq ($(os),macosx)
+    this_run_cmd := (cd $(d) && DYLD_LIBRARY_PATH=../../src/build ./$$(notdir $$^))
+else ifeq ($(os),linux)
+    this_run_cmd := (cd $(d) && LD_LIBRARY_PATH=../../src/build ./$$(notdir $$^))
+else
+    $(error "Unknown OS")
+endif
+
+
+define this_rules :=
 run:: $(prorab_this_name)
 $(.RECIPEPREFIX)@echo running $$^...
-$(.RECIPEPREFIX)$(Q)(cd $(d); LD_LIBRARY_PATH=../../src $$^)
+$(.RECIPEPREFIX)$(Q)$(this_run_cmd)
 
 test::
 
 endef
 $(eval $(this_rules))
 
-#======= if Windows ========
-ifeq ($(os),windows)
 
-define this_rules
-$(d)libaudout$(dot_so): $(abspath $(d)../../src/libaudout$(dot_so))
-$(.RECIPEPREFIX)$(Q)cp $< $@
-
-$(prorab_this_name): $(d)libaudout$(dot_so)
-
-clean::
-$(.RECIPEPREFIX)$(Q)rm -f $(d)libaudout$(dot_so)
-endef
-$(eval $(this_rules))
-
-# ======= else ========
-else
-
-$(prorab_this_name): $(abspath $(d)../../src/libaudout$(dot_so))
-
-endif
-# ======== endif =============
+$(prorab_this_name): $(abspath $(d)../../src/build/libaudout$(dot_so))
 
 $(eval $(call prorab-include, ../../src/makefile))

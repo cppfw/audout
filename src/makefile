@@ -40,4 +40,6 @@ endif
 
 this_ldlibs += 
 
+this_out_dir := build
+
 $(eval $(prorab-build-lib))
