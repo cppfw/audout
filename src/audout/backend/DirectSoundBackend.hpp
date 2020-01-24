@@ -2,6 +2,10 @@
 
 #include <utki/config.hpp>
 
+#include <opros/wait_set.hpp>
+
+#include <nitki/queue.hpp>
+
 #if M_OS != M_OS_WINDOWS
 #	error "compiling in non-Windows environment"
 #endif
@@ -11,8 +15,6 @@
 
 #include <initguid.h> // The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
 #include <dsound.h>
-
-#include <opros/wait_set.hpp>
 
 #include "../Player.hpp"
 #include "../Exc.hpp"
