@@ -45,6 +45,7 @@ else
     $(error "Unknown OS")
 endif
 
+.PHONY: test
 
 define this_rules :=
 run:: $(prorab_this_name)
