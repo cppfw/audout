@@ -154,7 +154,7 @@ class OpenSLESBackend{
 			// fill the second buffer to be enqueued next time the callback is called
             ASSERT(player->bufs[1].size() % 2 == 0)
 			player->backend.listener->fillPlayBuf(
-                    utki::Buf<std::int16_t>(
+                    utki::span<std::int16_t>(
                             reinterpret_cast<std::int16_t*>(&*player->bufs[1].begin()),
                             player->bufs[1].size() / 2
                         )

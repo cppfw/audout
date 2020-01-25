@@ -1,17 +1,13 @@
-/**
- * @author Ivan Gagis <igagis@gmail.com>
- */
-
 #pragma once
 
-#include <utki/Buf.hpp>
+#include <utki/span.hpp>
 
 namespace audout{
 
 //TODO: doxygen
 class Listener{
 public:
-	virtual void fillPlayBuf(utki::Buf<std::int16_t> playBuf)noexcept = 0;
+	virtual void fillPlayBuf(utki::span<int16_t> play_buffer)noexcept = 0;
 	
 	virtual ~Listener()noexcept{}
 };

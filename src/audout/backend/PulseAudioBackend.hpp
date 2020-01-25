@@ -11,7 +11,7 @@ namespace audout{
 class PulseAudioBackend : public WriteBasedBackend{
 	pa_simple *handle;
 	
-	void write(const utki::Buf<std::int16_t> buf)override{
+	void write(const utki::span<std::int16_t> buf)override{
 //		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		int error;

@@ -57,7 +57,7 @@ class AppleCoreaudioBackend{
 			auto& buf = ioData->mBuffers[i];
 //			TRACE(<< "num channels = " << buf.mNumberChannels << std::endl)
 			ASSERT(buf.mDataByteSize % sizeof(std::int16_t) == 0)
-			listener->fillPlayBuf(utki::wrapBuf(
+			listener->fillPlayBuf(utki::make_span(
 					reinterpret_cast<std::int16_t*>(buf.mData),
 					buf.mDataByteSize / sizeof(std::int16_t)
 				));

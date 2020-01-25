@@ -39,7 +39,7 @@ public:
 
 //		TRACE(<< "setting SW params" << std::endl)
 
-		this->SetSwParams(bufferSizeFrames);//must be called after this->SetHWParams()!!!
+		this->SetSwParams(bufferSizeFrames); // must be called after this->SetHWParams()
 
 		if(snd_pcm_prepare(this->device.handle) < 0){
 //			TRACE(<< "cannot prepare audio interface for use" << std::endl)
@@ -55,7 +55,7 @@ public:
 
 	int RecoverALSAFromXrun(int err){
 		TRACE(<< "stream recovery" << std::endl)
-		if(err == -EPIPE){// under-run
+		if(err == -EPIPE){ // underrun
 			err = snd_pcm_prepare(this->device.handle);
 			if (err < 0){
 				TRACE(
@@ -66,7 +66,7 @@ public:
 			return 0;
 		}else if(err == -ESTRPIPE){
 			while((err = snd_pcm_resume(this->device.handle)) == -EAGAIN)
-				nitki::Thread::sleep(100);// wait until the suspend flag is released
+				nitki::Thread::sleep(100); // wait until the suspend flag is released
 			if(err < 0){
 				err = snd_pcm_prepare(this->device.handle);
 				if (err < 0){
@@ -82,14 +82,14 @@ public:
 	}
 
 
-	void write(const utki::Buf<std::int16_t> buf)override{
+	void write(const utki::span<std::int16_t> buf)override{
 		ASSERT(buf.size() % this->bytesPerFrame == 0)
 		
 		unsigned bufferSizeFrames = buf.size() / this->bytesPerFrame;
 		
 		unsigned numFramesWritten = 0;
 		while(numFramesWritten < bufferSizeFrames){
-			//write interleaved samples
+			// write interleaved samples
 			int ret = snd_pcm_writei(
 					this->device.handle,
 					reinterpret_cast<const void*>(&buf[numFramesWritten * this->bytesPerFrame]),
@@ -212,13 +212,13 @@ public:
 			throw std::runtime_error("cannot initialize software parameters structure");
 		}
 
-		//tell ALSA to wake us up whenever 'buffer size' frames of playback data can be delivered
+		// tell ALSA to wake us up whenever 'buffer size' frames of playback data can be delivered
 		if(snd_pcm_sw_params_set_avail_min(this->device.handle, sw.params, bufferSizeFrames) < 0){
 			TRACE(<< "cannot set minimum available count" << std::endl)
 			throw std::runtime_error("cannot set minimum available count");
 		}
 
-		//tell ALSA to start playing on first data write
+		// tell ALSA to start playing on first data write
 		if(snd_pcm_sw_params_set_start_threshold(this->device.handle, sw.params, 0) < 0){
 			TRACE(<< "cannot set start mode" << std::endl)
 			throw std::runtime_error("cannot set start mode");

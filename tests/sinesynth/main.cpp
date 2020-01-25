@@ -14,7 +14,7 @@ struct SinePlayer : public audout::Listener{
 
 	audout::AudioFormat format;
 	
-	void fillPlayBuf(utki::Buf<std::int16_t> buf)noexcept override{
+	void fillPlayBuf(utki::span<std::int16_t> buf)noexcept override{
 //		TRACE_ALWAYS(<< "filling smp buf" << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){

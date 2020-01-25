@@ -44,7 +44,7 @@ protected:
 		this->thread = std::thread([this](){this->run();});
 	}
 	
-	virtual void write(const utki::Buf<std::int16_t> buf) = 0;
+	virtual void write(const utki::span<int16_t> buf) = 0;
 	
 public:
 	virtual ~WriteBasedBackend()noexcept{}
@@ -73,9 +73,9 @@ private:
 				m();
 			}
 
-			this->listener->fillPlayBuf(utki::wrapBuf(this->playBuf));
+			this->listener->fillPlayBuf(utki::make_span(this->playBuf));
 			
-			this->write(utki::wrapBuf(this->playBuf));
+			this->write(utki::make_span(this->playBuf));
 		}
 		
 		ws.remove(this->queue);
