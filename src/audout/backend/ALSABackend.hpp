@@ -6,7 +6,6 @@
 
 #include "WriteBasedBackend.hpp"
 
-#include "../Exc.hpp"
 
 namespace audout{
 
@@ -18,7 +17,7 @@ class ALSABackend : public WriteBasedBackend{
 			// open PCM device for playback
 			if(snd_pcm_open(&this->handle, "default" /*"hw:0,0"*/, SND_PCM_STREAM_PLAYBACK, 0) < 0){
 //				TRACE(<< "ALSA: unable to open pcm device" << std::endl)
-				throw audout::Exc("ALSA: unable to open pcm device");
+				throw std::runtime_error("ALSA: unable to open pcm device");
 			}
 		}
 		
@@ -44,7 +43,7 @@ public:
 
 		if(snd_pcm_prepare(this->device.handle) < 0){
 //			TRACE(<< "cannot prepare audio interface for use" << std::endl)
-			throw audout::Exc("cannot set parameters");
+			throw std::runtime_error("cannot set parameters");
 		}
 		
 		this->startThread();
@@ -103,7 +102,7 @@ public:
 				int err = this->RecoverALSAFromXrun(ret);
 				if(err < 0){
 //					LOG(<< "write to audio interface failed, err = " << snd_strerror(err) << std::endl)
-					throw audout::Exc("write to audio interface failed");
+					throw std::runtime_error("write to audio interface failed");
 				}
 			}
 			numFramesWritten += ret;
@@ -117,7 +116,7 @@ public:
 			HwParams(){
 				if(snd_pcm_hw_params_malloc(&this->params) < 0){
 					TRACE(<< "cannot allocate hardware parameter structure" << std::endl)
-					throw audout::Exc("cannot allocate hardware parameter structure");
+					throw std::runtime_error("cannot allocate hardware parameter structure");
 				}
 			}
 			
@@ -128,33 +127,33 @@ public:
 
 		if(snd_pcm_hw_params_any(this->device.handle, hw.params) < 0){
 			TRACE(<< "cannot initialize hardware parameter structure" << std::endl)
-			throw audout::Exc("cannot initialize hardware parameter structure");
+			throw std::runtime_error("cannot initialize hardware parameter structure");
 		}
 
 		if(snd_pcm_hw_params_set_access(this->device.handle, hw.params, SND_PCM_ACCESS_RW_INTERLEAVED) < 0){
 			TRACE(<< "cannot set access type" << std::endl)
-			throw audout::Exc("cannot set access type");
+			throw std::runtime_error("cannot set access type");
 		}
 
 		if(snd_pcm_hw_params_set_format(this->device.handle, hw.params, SND_PCM_FORMAT_S16_LE) < 0){
 			TRACE(<< "cannot set sample format" << std::endl)
-			throw audout::Exc("cannot set sample format");
+			throw std::runtime_error("cannot set sample format");
 		}
 
 		{
 			unsigned val = format.frequency();
 			if(snd_pcm_hw_params_set_rate_near(this->device.handle, hw.params, &val, 0) < 0){
 				TRACE(<< "cannot set sample rate" << std::endl)
-				throw audout::Exc("cannot set sample rate");
+				throw std::runtime_error("cannot set sample rate");
 			}
 		}
 
 		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, format.numChannels()) < 0){
 			TRACE(<< "cannot set channel count" << std::endl)
-			throw audout::Exc("cannot set channel count");
+			throw std::runtime_error("cannot set channel count");
 		}
 
-		//Set period size
+		// set period size
 		{
 			snd_pcm_uframes_t frames = snd_pcm_uframes_t(bufferSizeFrames);
 			int dir = 0;
@@ -167,7 +166,7 @@ public:
 			)
 			{
 				TRACE(<< "could not set period size" << std::endl)
-				throw audout::Exc("could not set period size");
+				throw std::runtime_error("could not set period size");
 			}
 
 //			TRACE(<< "buffer size in samples = " << this->BufferSizeInSamples() << std::endl)
@@ -179,16 +178,16 @@ public:
 			int err = snd_pcm_hw_params_set_periods_near(this->device.handle, hw.params, &numPeriods, NULL);
 			if(err < 0){
 				TRACE(<< "could not set number of periods, err = " << err << std::endl)
-				throw audout::Exc("could not set number of periods");
+				throw std::runtime_error("could not set number of periods");
 			}
 			TRACE(<< "numPeriods = " << numPeriods << std::endl)
 		}
 
 
-		//set hw params
+		// set hw params
 		if(snd_pcm_hw_params(this->device.handle, hw.params) < 0){
 			TRACE(<< "cannot set parameters" << std::endl)
-			throw audout::Exc("cannot set parameters");
+			throw std::runtime_error("cannot set parameters");
 		}
 	}
 
@@ -200,7 +199,7 @@ public:
 			SwParams(){
 				if(snd_pcm_sw_params_malloc(&this->params) < 0){
 					TRACE(<< "cannot allocate software parameters structure" << std::endl)
-					throw audout::Exc("cannot allocate software parameters structure");
+					throw std::runtime_error("cannot allocate software parameters structure");
 				}
 			}
 			~SwParams(){
@@ -210,27 +209,27 @@ public:
 
 		if(snd_pcm_sw_params_current(this->device.handle, sw.params) < 0){
 			TRACE(<< "cannot initialize software parameters structure" << std::endl)
-			throw audout::Exc("cannot initialize software parameters structure");
+			throw std::runtime_error("cannot initialize software parameters structure");
 		}
 
 		//tell ALSA to wake us up whenever 'buffer size' frames of playback data can be delivered
 		if(snd_pcm_sw_params_set_avail_min(this->device.handle, sw.params, bufferSizeFrames) < 0){
 			TRACE(<< "cannot set minimum available count" << std::endl)
-			throw audout::Exc("cannot set minimum available count");
+			throw std::runtime_error("cannot set minimum available count");
 		}
 
 		//tell ALSA to start playing on first data write
 		if(snd_pcm_sw_params_set_start_threshold(this->device.handle, sw.params, 0) < 0){
 			TRACE(<< "cannot set start mode" << std::endl)
-			throw audout::Exc("cannot set start mode");
+			throw std::runtime_error("cannot set start mode");
 		}
 
 		if(snd_pcm_sw_params(this->device.handle, sw.params) < 0){
 			TRACE(<< "cannot set software parameters" << std::endl)
-			throw audout::Exc("cannot set software parameters");
+			throw std::runtime_error("cannot set software parameters");
 		}
 	}
 	
 };
 
-}//~namespace
+}

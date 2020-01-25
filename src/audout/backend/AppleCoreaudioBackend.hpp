@@ -2,7 +2,6 @@
 
 #include <utki/config.hpp>
 
-#include "../Exc.hpp"
 #include "../AudioFormat.hpp"
 #include "../Listener.hpp"
 
@@ -30,11 +29,11 @@ class AppleCoreaudioBackend{
 
 			auto component = AudioComponentFindNext(nullptr, &desc);
 			if(!component){
-				throw audout::Exc("Failed to find default audio device");
+				throw std::runtime_error("Failed to find default audio device");
 			}
 
 			if(AudioComponentInstanceNew(component, &this->instance)){
-				throw audout::Exc("Failed to open default audio device");
+				throw std::runtime_error("Failed to open default audio device");
 			}
 		}
 
@@ -75,7 +74,7 @@ public:
 		)
 	{
 		if(AudioUnitInitialize(this->audioComponent.instance)){
-			throw audout::Exc("Failed to initialize audio unit instance");
+			throw std::runtime_error("Failed to initialize audio unit instance");
 		}
 
 		AudioStreamBasicDescription formatDesc;
@@ -97,7 +96,7 @@ public:
 				sizeof(formatDesc)
 			))
 		{
-			throw audout::Exc("Failed to set audio unit input property");
+			throw std::runtime_error("Failed to set audio unit input property");
 		}
 
 		AURenderCallbackStruct callback;
@@ -114,7 +113,7 @@ public:
 				sizeof(callback)
 			))
 		{
-			throw audout::Exc("Unable to attach an IOProc to the selected audio unit");
+			throw std::runtime_error("Unable to attach an IOProc to the selected audio unit");
 		}
 
 		this->setPaused(false);
@@ -129,7 +128,7 @@ public:
 			AudioOutputUnitStop(this->audioComponent.instance);
 		}else{
 			if(AudioOutputUnitStart(this->audioComponent.instance)){
-				throw audout::Exc("Unable to start audio unit");
+				throw std::runtime_error("Unable to start audio unit");
 			}
 		}
 	}

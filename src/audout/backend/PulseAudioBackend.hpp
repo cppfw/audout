@@ -3,7 +3,6 @@
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
-#include "../Exc.hpp"
 #include "WriteBasedBackend.hpp"
 
 
@@ -70,7 +69,9 @@ public:
 
 		if(!this->handle){
 			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
-			throw audout::Exc("error opening PulseAudio connection");
+			std::stringstream ss;
+			ss << "error opening PulseAudio connection: " << pa_strerror(error);
+			throw std::runtime_error(ss.str());
 		}
 		
 		this->startThread();
