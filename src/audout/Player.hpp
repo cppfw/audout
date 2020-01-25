@@ -6,7 +6,6 @@
 #include "AudioFormat.hpp"
 #include "Listener.hpp"
 
-
 #if M_OS == M_OS_WINDOWS
 #	include "backend/DirectSoundBackend.hpp"
 #elif M_OS == M_OS_LINUX
@@ -14,7 +13,7 @@
 #		include "backend/OpenSLESBackend.hpp"
 #	else
 #		include "backend/PulseAudioBackend.hpp"
-//#		include "backend/ALSABackend.hpp"
+// #		include "backend/ALSABackend.hpp"
 #	endif
 #elif M_OS == M_OS_MACOSX
 #	include "backend/AppleCoreaudioBackend.hpp"
@@ -37,7 +36,7 @@ class Player : public utki::intrusive_singleton<Player>{
 	OpenSLESBackend backend;
 #	else
 	PulseAudioBackend backend;
-//	ALSABackend backend;
+	// ALSABackend backend;
 #	endif
 #elif M_OS == M_OS_MACOSX
 	AppleCoreaudioBackend backend;

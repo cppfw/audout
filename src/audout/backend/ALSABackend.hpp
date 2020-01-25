@@ -66,7 +66,7 @@ public:
 			return 0;
 		}else if(err == -ESTRPIPE){
 			while((err = snd_pcm_resume(this->device.handle)) == -EAGAIN)
-				nitki::Thread::sleep(100); // wait until the suspend flag is released
+				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // wait until the suspend flag is released
 			if(err < 0){
 				err = snd_pcm_prepare(this->device.handle);
 				if (err < 0){
