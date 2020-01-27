@@ -152,8 +152,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\audout\AudioFormat.cpp" />
-    <ClCompile Include="..\..\src\audout\Player.cpp" />
+    <ClCompile Include="..\..\src\**\*.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
