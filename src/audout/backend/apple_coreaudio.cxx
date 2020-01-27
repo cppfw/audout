@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utki/config.hpp>
+#include <utki/destructable.hpp>
 
 #include "../format.hpp"
 
@@ -8,7 +9,7 @@
 
 namespace{
 
-class audio_backend{
+class audio_backend : public utki::destructable{
 
 	struct AudioComponent{
 		AudioComponentInstance instance;
