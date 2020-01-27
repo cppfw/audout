@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utki/config.hpp>
+#include <utki/destructable.hpp>
 
 #include <opros/wait_set.hpp>
 
@@ -80,7 +81,7 @@ public:
 
 
 
-class audio_backend{
+class audio_backend : public utki::destructable{
 	audout::listener* listener;
 
 	std::thread thread;
