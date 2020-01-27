@@ -4,6 +4,7 @@
 #include <array>
 
 #include <utki/util.hpp>
+#include <utki/destructable.hpp>
 
 #include <SLES/OpenSLES.h>
 
@@ -18,7 +19,7 @@
 
 namespace{
 
-class audio_backend{
+class audio_backend : public utki::destructable{
 
     audout::listener* listener;
 
