@@ -1,3 +1,9 @@
+libaudout (0.3.25) unstable; urgency=medium
+
+  * renamings
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 28 Jan 2020 00:37:40 +0200
+
 libaudout (0.3.24) unstable; urgency=medium
 
   * refactoring
