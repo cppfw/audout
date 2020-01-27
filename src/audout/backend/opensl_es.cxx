@@ -168,7 +168,7 @@ class audio_backend{
 		{
 			// allocate play buffers of required size
 			{
-				size_t bufSize = bufferSizeFrames * format.bytesPerFrame();
+				size_t bufSize = bufferSizeFrames * format.frame_size();
                 ASSERT(this->bufs.size() == 2)
                 for(auto& b : this->bufs){
                     b.resize(bufSize);

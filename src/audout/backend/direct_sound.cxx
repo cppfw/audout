@@ -81,7 +81,7 @@ public:
 
 
 class audio_backend{
-	listener* listener;
+	audout::listener* listener;
 
 	std::thread thread;
 
@@ -123,7 +123,7 @@ class audio_backend{
 		unsigned halfSize;
 		
 		direct_sound_buffer(direct_sound& ds, unsigned bufferSizeFrames, audout::format format) :
-				halfSize(format.bytesPerFrame() * bufferSizeFrames)
+				halfSize(format.frame_size() * bufferSizeFrames)
 		{
 			WAVEFORMATEX wf;
 			memset(&wf, 0, sizeof(WAVEFORMATEX));
@@ -285,7 +285,7 @@ public:
 	}
 
 public:
-	audio_backend(audout::format format, unsigned bufferSizeFrames, listener* listener) :
+	audio_backend(audout::format format, unsigned bufferSizeFrames, audout::listener* listener) :
 			listener(listener),
 			dsb(this->ds, bufferSizeFrames, format)
 	{

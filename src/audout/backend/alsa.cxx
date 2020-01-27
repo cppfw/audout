@@ -29,12 +29,12 @@ class audio_backend : public write_based, public utki::destructable{
 		}
 	} device;
 
-	unsigned bytesPerFrame;
+	unsigned frame_size;
 	
 public:
 	audio_backend(audout::format format, unsigned bufferSizeFrames, audout::listener* listener) :
 			write_based(listener, bufferSizeFrames * format.num_channels()),
-			bytesPerFrame(format.frame_size())
+			frame_size(format.frame_size())
 	{
 //		TRACE(<< "setting HW params" << std::endl)
 
@@ -86,16 +86,16 @@ public:
 
 
 	void write(const utki::span<std::int16_t> buf)override{
-		ASSERT(buf.size() % this->bytesPerFrame == 0)
+		ASSERT(buf.size() % this->frame_size == 0)
 		
-		unsigned bufferSizeFrames = buf.size() / this->bytesPerFrame;
+		unsigned bufferSizeFrames = buf.size() / this->frame_size;
 		
 		unsigned numFramesWritten = 0;
 		while(numFramesWritten < bufferSizeFrames){
 			// write interleaved samples
 			int ret = snd_pcm_writei(
 					this->device.handle,
-					reinterpret_cast<const void*>(&buf[numFramesWritten * this->bytesPerFrame]),
+					reinterpret_cast<const void*>(&buf[numFramesWritten * this->frame_size]),
 					bufferSizeFrames - numFramesWritten
 				);
 			if(ret < 0){

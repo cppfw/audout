@@ -24,7 +24,7 @@ else ifeq ($(os),macosx)
     this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
     this_ldlibs +=
 else ifeq ($(os),linux)
-    this_ldlibs += 
+    this_ldlibs += -lpthread
     this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
 endif
 
