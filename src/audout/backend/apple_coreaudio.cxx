@@ -51,7 +51,7 @@ class audio_backend : public utki::destructable{
 			AudioBufferList *ioData
 		)
 	{
-		auto listener = reinterpret_cast<listener*>(inRefCon);
+		auto listener = reinterpret_cast<audout::listener*>(inRefCon);
 
 		for(unsigned i = 0; i != ioData->mNumberBuffers; ++i){
 			auto& buf = ioData->mBuffers[i];
