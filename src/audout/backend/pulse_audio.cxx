@@ -1,14 +1,16 @@
 #pragma once
 
+#include <utki/destructable.hpp>
+
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
-#include "WriteBasedBackend.hpp"
+#include "write_based.cxx"
 
 
-namespace audout{
+namespace{
 
-class PulseAudioBackend : public WriteBasedBackend{
+class audio_backend : public write_based, public utki::destructable{
 	pa_simple *handle;
 	
 	void write(const utki::span<std::int16_t> buf)override{
@@ -28,21 +30,21 @@ class PulseAudioBackend : public WriteBasedBackend{
 	}
 	
 public:
-	PulseAudioBackend(
-			audout::AudioFormat outputFormat,
-			std::uint32_t bufferSizeFrames,
-			audout::Listener* listener
+	audio_backend(
+			audout::format outputFormat,
+			uint32_t bufferSizeFrames,
+			audout::listener* listener
 		) :
-			WriteBasedBackend(listener, bufferSizeFrames * outputFormat.numChannels())
+			write_based(listener, bufferSizeFrames * outputFormat.num_channels())
 	{
 		TRACE(<< "opening device" << std::endl)
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
-		ss.channels = outputFormat.numChannels();
+		ss.channels = outputFormat.num_channels();
 		ss.rate = outputFormat.frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.bytesPerFrame();
+		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.frame_size();
 		pa_buffer_attr ba;
 		ba.fragsize = bufferSizeInBytes;
 		ba.tlength = bufferSizeInBytes;
@@ -77,7 +79,7 @@ public:
 		this->startThread();
 	}
 	
-	virtual ~PulseAudioBackend()noexcept{
+	virtual ~audio_backend()noexcept{
 		this->stopThread();
 		
 		ASSERT(this->handle)

@@ -5,14 +5,13 @@
 
 #include <nitki/queue.hpp>
 
-#include "../Player.hpp"
-#include "../Listener.hpp"
+#include "../player.hpp"
 
 
-namespace audout{
+namespace{
 
-class WriteBasedBackend{
-	audout::Listener* listener;
+class write_based{
+	audout::listener* listener;
 	
 	std::vector<std::int16_t> playBuf;
 	
@@ -25,8 +24,8 @@ class WriteBasedBackend{
 protected:
 	bool isPaused = true;
 	
-	WriteBasedBackend(
-			audout::Listener* listener,
+	write_based(
+			audout::listener* listener,
 			size_t playBufSizeInSamples
 		) :
 			listener(listener),
@@ -47,7 +46,7 @@ protected:
 	virtual void write(const utki::span<int16_t> buf) = 0;
 	
 public:
-	virtual ~WriteBasedBackend()noexcept{}
+	virtual ~write_based()noexcept{}
 	
 private:
 	
@@ -73,7 +72,7 @@ private:
 				m();
 			}
 
-			this->listener->fillPlayBuf(utki::make_span(this->playBuf));
+			this->listener->fill(utki::make_span(this->playBuf));
 			
 			this->write(utki::make_span(this->playBuf));
 		}

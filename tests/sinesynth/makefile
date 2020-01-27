@@ -19,12 +19,12 @@ endif
 
 ifeq ($(os),windows)
     this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
-    this_ldlibs += -lnitki -lopros -ldsound
+    this_ldlibs +=
 else ifeq ($(os),macosx)
     this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
-    this_ldlibs += -framework AudioUnit
+    this_ldlibs +=
 else ifeq ($(os),linux)
-    this_ldlibs += -lopros -lnitki -lpthread -lpulse -lpulse-simple #-lasound
+    this_ldlibs += 
     this_ldlibs += $(d)../../src/build/libaudout$(dot_so)
 endif
 

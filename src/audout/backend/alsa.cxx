@@ -4,12 +4,15 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 
-#include "WriteBasedBackend.hpp"
+#include <utki/destructable.hpp>
 
+#include "write_based.cxx"
 
-namespace audout{
+#include "../player.hpp"
 
-class ALSABackend : public WriteBasedBackend{
+namespace{
+
+class audio_backend : public write_based, public utki::destructable{
 	struct Device{
 		snd_pcm_t *handle;
 		
@@ -29,9 +32,9 @@ class ALSABackend : public WriteBasedBackend{
 	unsigned bytesPerFrame;
 	
 public:
-	ALSABackend(AudioFormat format, unsigned bufferSizeFrames, Listener* listener) :
-			WriteBasedBackend(listener, bufferSizeFrames * format.numChannels()),
-			bytesPerFrame(format.bytesPerFrame())
+	audio_backend(audout::format format, unsigned bufferSizeFrames, audout::listener* listener) :
+			write_based(listener, bufferSizeFrames * format.num_channels()),
+			bytesPerFrame(format.frame_size())
 	{
 //		TRACE(<< "setting HW params" << std::endl)
 
@@ -49,7 +52,7 @@ public:
 		this->startThread();
 	}
 
-	virtual ~ALSABackend()throw(){
+	virtual ~audio_backend()throw(){
 		this->stopThread();
 	}
 
@@ -109,7 +112,7 @@ public:
 		}
 	}
 
-	void SetHWParams(unsigned bufferSizeFrames, AudioFormat format){
+	void SetHWParams(unsigned bufferSizeFrames, audout::format format){
 		struct HwParams{
 			snd_pcm_hw_params_t* params;
 			
@@ -148,7 +151,7 @@ public:
 			}
 		}
 
-		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, format.numChannels()) < 0){
+		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, format.num_channels()) < 0){
 			TRACE(<< "cannot set channel count" << std::endl)
 			throw std::runtime_error("cannot set channel count");
 		}

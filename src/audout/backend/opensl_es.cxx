@@ -13,14 +13,14 @@
 
 #endif
 
-#include "../Player.hpp"
+#include "../player.hpp"
 
 
-namespace audout{
+namespace{
 
-class OpenSLESBackend{
+class audio_backend{
 
-    audout::Listener* listener;
+    audout::listener* listener;
 
 	struct Engine{
 		SLObjectItf object; // object
@@ -100,7 +100,7 @@ class OpenSLESBackend{
 	
 	
 	struct Player{
-		OpenSLESBackend& backend;
+		audio_backend& backend;
 		
 		SLObjectItf object;
 		SLPlayItf play;
@@ -129,7 +129,7 @@ class OpenSLESBackend{
 #endif
 			)
 		{
-//			TRACE(<< "OpenSLESBackend::Player::Callback(): invoked" << std::endl)
+//			TRACE(<< "audio_backend::Player::Callback(): invoked" << std::endl)
 			
 			ASSERT(context)
 			Player* player = static_cast<Player*>(context);
@@ -153,7 +153,7 @@ class OpenSLESBackend{
 			
 			// fill the second buffer to be enqueued next time the callback is called
             ASSERT(player->bufs[1].size() % 2 == 0)
-			player->backend.listener->fillPlayBuf(
+			player->backend.listener->fill(
                     utki::span<std::int16_t>(
                             reinterpret_cast<std::int16_t*>(&*player->bufs[1].begin()),
                             player->bufs[1].size() / 2
@@ -163,7 +163,7 @@ class OpenSLESBackend{
 		
 		
 		
-		Player(OpenSLESBackend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, audout::AudioFormat format) :
+		Player(audio_backend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, audout::format format) :
 				backend(backend)
 		{
 			// allocate play buffers of required size
@@ -185,9 +185,9 @@ class OpenSLESBackend{
 			SLDataLocator_BufferQueue bufferQueueStruct = {SL_DATALOCATOR_BUFFERQUEUE, 2}; // 2 buffers in queue
 #endif
 			
-			unsigned numChannels = format.numChannels();
+			unsigned num_channels = format.num_channels();
 			SLuint32 channelMask;
-			switch(numChannels){
+			switch(num_channels){
 				case 1:
 					channelMask = SL_SPEAKER_FRONT_CENTER;
 					break;
@@ -200,7 +200,7 @@ class OpenSLESBackend{
 			}
 			SLDataFormat_PCM audioFormat = {
 				SL_DATAFORMAT_PCM,
-				numChannels, // number of channels
+				num_channels, // number of channels
 				format.frequency() * 1000, // milliHertz
 				16, // bits per sample, if 16bits then sample is signed 16bit integer
 				16, // container size for sample, it can be bigger than sample itself. E.g. 32bit container for 16bits sample
@@ -298,16 +298,16 @@ public:
     }
 
 	// create buffered queue player
-	OpenSLESBackend(
-            audout::AudioFormat outputFormat,
+	audio_backend(
+            audout::format outputFormat,
             std::uint32_t bufferSizeFrames,
-            audout::Listener* listener
+            audout::listener* listener
         ) :
             listener(listener),
 			outputMix(this->engine),
 			player(*this, this->engine, this->outputMix, bufferSizeFrames, outputFormat)
 	{
-//		TRACE(<< "OpenSLESBackend::OpenSLESBackend(): Starting player" << std::endl)
+//		TRACE(<< "audio_backend::audio_backend(): Starting player" << std::endl)
 		this->setPaused(false);
 		
 		// enqueue the first buffer for playing, otherwise it will not start playing
@@ -332,7 +332,7 @@ public:
 
 	
 	
-	~OpenSLESBackend()noexcept{
+	~audio_backend()noexcept{
 		// stop player playing
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);

@@ -16,10 +16,9 @@
 #include <initguid.h> // The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
 #include <dsound.h>
 
-#include "../Player.hpp"
+#include "../player.hpp"
 
-
-namespace audout{
+namespace{
 
 class WinEvent : public opros::waitable{
 	HANDLE eventForWaitable;
@@ -81,8 +80,8 @@ public:
 
 
 
-class DirectSoundBackend{
-	Listener* listener;
+class audio_backend{
+	listener* listener;
 
 	std::thread thread;
 
@@ -123,13 +122,13 @@ class DirectSoundBackend{
 		
 		unsigned halfSize;
 		
-		direct_sound_buffer(direct_sound& ds, unsigned bufferSizeFrames, AudioFormat format) :
+		direct_sound_buffer(direct_sound& ds, unsigned bufferSizeFrames, audout::format format) :
 				halfSize(format.bytesPerFrame() * bufferSizeFrames)
 		{
 			WAVEFORMATEX wf;
 			memset(&wf, 0, sizeof(WAVEFORMATEX));
 
-			wf.nChannels = format.numChannels();
+			wf.nChannels = format.num_channels();
 			wf.nSamplesPerSec = format.frequency();
 
 			wf.wFormatTag = WAVE_FORMAT_PCM;
@@ -229,7 +228,7 @@ class DirectSoundBackend{
 		ASSERT(addr != 0)
 		ASSERT(size == this->dsb.halfSize)
 
-		this->listener->fillPlayBuf(utki::make_span(static_cast<std::int16_t*>(addr), size / 2));
+		this->listener->fill(utki::make_span(static_cast<std::int16_t*>(addr), size / 2));
 
 		// unlock the buffer
 		if(this->dsb.dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
@@ -246,7 +245,7 @@ class DirectSoundBackend{
 		ws.add(this->event2, {opros::ready::read});
 		
 		while(!this->quitFlag){
-//			TRACE(<< "Backend loop" << std::endl)
+//			TRACE(<< "audio_backend loop" << std::endl)
 			
 			ws.wait();
 			
@@ -286,7 +285,7 @@ public:
 	}
 
 public:
-	DirectSoundBackend(AudioFormat format, unsigned bufferSizeFrames, Listener* listener) :
+	audio_backend(audout::format format, unsigned bufferSizeFrames, listener* listener) :
 			listener(listener),
 			dsb(this->ds, bufferSizeFrames, format)
 	{
@@ -323,7 +322,7 @@ public:
 		this->setPaused(false);
 	}
 	
-	~DirectSoundBackend()noexcept{
+	~audio_backend()noexcept{
 		// stop buffer playing
 		if(this->dsb.dsb->Stop() != DS_OK){
 			ASSERT(false)
@@ -335,5 +334,4 @@ public:
 		this->thread.join();
 	}
 };
-
 }

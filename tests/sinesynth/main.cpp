@@ -2,19 +2,19 @@
 #include <utki/config.hpp>
 #include <nitki/Thread.hpp>
 
-#include "../../src/audout/Player.hpp"
+#include "../../src/audout/player.hpp"
 
 #if M_OS_NAME == M_OS_NAME_ANDROID
 #	include <jni.h>
 #endif
 
 
-struct SinePlayer : public audout::Listener{
+struct SinePlayer : public audout::listener{
 	double time = 0;
 
-	audout::AudioFormat format;
+	audout::format format;
 	
-	void fillPlayBuf(utki::span<std::int16_t> buf)noexcept override{
+	void fill(utki::span<std::int16_t> buf)noexcept override{
 //		TRACE_ALWAYS(<< "filling smp buf" << std::endl)
 
 		for(auto dst = buf.begin(); dst != buf.end();){
@@ -22,7 +22,7 @@ struct SinePlayer : public audout::Listener{
 					decltype(this->time)(0x7fff) * std::sin(this->time * 2 * utki::pi<decltype(this->time)>() * 220.0f)
 				);
 			this->time += 1 / decltype(this->time)(format.frequency());
-			for(unsigned i = 0; i != format.numChannels(); ++i){
+			for(unsigned i = 0; i != format.num_channels(); ++i){
 				ASSERT(buf.overlaps(dst))
 				*dst = v;
 				++dst;
@@ -33,15 +33,15 @@ struct SinePlayer : public audout::Listener{
 //		TRACE(<< "this->smpBuf = " << buf << std::endl)
 	}
 	
-	SinePlayer(audout::AudioFormat format) :
+	SinePlayer(audout::format format) :
 			format(format)
 	{}
 };
 
-void play(audout::AudioFormat format){
+void play(audout::format format){
 	SinePlayer pl(format);
-	audout::Player p(format, 1000, &pl);
-	p.setPaused(false);
+	audout::player p(format, 1000, &pl);
+	p.set_paused(false);
 
 	nitki::Thread::sleep(2000);
 }
@@ -50,43 +50,43 @@ void play(audout::AudioFormat format){
 void test(){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_11025));
+		play(audout::format(audout::frame_type::mono, audout::sampling_rate::hz11025));
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_11025));
+		play(audout::format(audout::frame_type::stereo, audout::sampling_rate::hz11025));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_22050));
+		play(audout::format(audout::frame_type::mono, audout::sampling_rate::hz22050));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_22050));
+		play(audout::format(audout::frame_type::stereo, audout::sampling_rate::hz22050));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_44100));
+		play(audout::format(audout::frame_type::mono, audout::sampling_rate::hz44100));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_44100));
+		play(audout::format(audout::frame_type::stereo, audout::sampling_rate::hz44100));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::MONO, audout::SamplingRate_e::HZ_48000));
+		play(audout::format(audout::frame_type::mono, audout::sampling_rate::hz48000));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 48000" << std::endl)
-		play(audout::AudioFormat(audout::Frame_e::STEREO, audout::SamplingRate_e::HZ_48000));
+		play(audout::format(audout::frame_type::stereo, audout::sampling_rate::hz48000));
 	}
 }
 

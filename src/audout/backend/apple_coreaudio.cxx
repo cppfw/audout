@@ -2,14 +2,13 @@
 
 #include <utki/config.hpp>
 
-#include "../AudioFormat.hpp"
-#include "../Listener.hpp"
+#include "../format.hpp"
 
 #include <AudioUnit/AudioUnit.h>
 
-namespace audout{
+namespace{
 
-class AppleCoreaudioBackend{
+class audio_backend{
 
 	struct AudioComponent{
 		AudioComponentInstance instance;
@@ -51,13 +50,13 @@ class AppleCoreaudioBackend{
 			AudioBufferList *ioData
 		)
 	{
-		auto listener = reinterpret_cast<Listener*>(inRefCon);
+		auto listener = reinterpret_cast<listener*>(inRefCon);
 
 		for(unsigned i = 0; i != ioData->mNumberBuffers; ++i){
 			auto& buf = ioData->mBuffers[i];
 //			TRACE(<< "num channels = " << buf.mNumberChannels << std::endl)
 			ASSERT(buf.mDataByteSize % sizeof(std::int16_t) == 0)
-			listener->fillPlayBuf(utki::make_span(
+			listener->fill(utki::make_span(
 					reinterpret_cast<std::int16_t*>(buf.mData),
 					buf.mDataByteSize / sizeof(std::int16_t)
 				));
@@ -67,10 +66,10 @@ class AppleCoreaudioBackend{
 	}
 
 public:
-	AppleCoreaudioBackend(
-			audout::AudioFormat outputFormat,
+	audio_backend(
+			audout::format outputFormat,
 			std::uint32_t bufferSizeFrames,
-			audout::Listener* listener
+			audout::listener* listener
 		)
 	{
 		if(AudioUnitInitialize(this->audioComponent.instance)){
@@ -82,7 +81,7 @@ public:
 		formatDesc.mFormatID = kAudioFormatLinearPCM;
 		formatDesc.mFormatFlags = kAudioFormatFlagIsSignedInteger;
 		formatDesc.mFramesPerPacket = 1;
-		formatDesc.mChannelsPerFrame = outputFormat.numChannels();
+		formatDesc.mChannelsPerFrame = outputFormat.num_channels();
 		formatDesc.mBitsPerChannel = 16;
 		formatDesc.mBytesPerFrame = formatDesc.mChannelsPerFrame * 2;
 		formatDesc.mBytesPerPacket = formatDesc.mBytesPerFrame * formatDesc.mFramesPerPacket;
@@ -119,7 +118,7 @@ public:
 		this->setPaused(false);
 	}
 
-	~AppleCoreaudioBackend()noexcept{
+	~audio_backend()noexcept{
 		this->setPaused(true);
 	}
 
