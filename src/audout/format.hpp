@@ -2,15 +2,16 @@
 
 namespace audout{
 
-enum class frame_type{
+enum class frame{
 	mono = 1,
-	stereo = 2,
-	quadro = 4,
-	five_dot_one = 6,
-	seven_dot_one = 8
+	stereo = 2
 };
 
-enum class sampling_rate{
+constexpr inline unsigned num_channels(frame frame_type)noexcept{
+	return unsigned(frame_type);
+}
+
+enum class rate{
 	hz11025 = 11025,
 	hz22050 = 22050,
 	hz44100 = 44100,
@@ -19,21 +20,17 @@ enum class sampling_rate{
 
 class format{
 public:
-	audout::frame_type frame_type;
+	frame frame_type;
 	
-	constexpr static unsigned num_channels(audout::frame_type frame_type)noexcept{
-		return unsigned(frame_type);
-	}
+	rate sampling_rate;
 	
-	audout::sampling_rate sampling_rate;
-	
-	format(audout::frame_type frame_type, audout::sampling_rate sampling_rate) :
+	format(frame frame_type, rate sampling_rate) :
 			frame_type(frame_type),
 			sampling_rate(sampling_rate)
 	{}
 	
 	unsigned num_channels()const noexcept{
-		return num_channels(this->frame_type);
+		return audout::num_channels(this->frame_type);
 	}
 
 	unsigned frequency()const noexcept{
