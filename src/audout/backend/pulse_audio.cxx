@@ -21,7 +21,7 @@ class audio_backend : public write_based, public utki::destructable{
 		if(pa_simple_write(
 				this->handle,
 				&*buf.begin(),
-				size_t(buf.sizeInBytes()),
+				size_t(buf.size_bytes()),
 				&error
 			) < 0)
 		{
