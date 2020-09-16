@@ -1,3 +1,9 @@
+libaudout (0.3.28) unstable; urgency=medium
+
+  * msvs package rename to libaudout
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 16 Sep 2020 23:11:45 +0300
+
 libaudout (0.3.27) unstable; urgency=medium
 
   * nuget token corrected
