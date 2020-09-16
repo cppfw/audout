@@ -16,7 +16,6 @@
 
 #include "../player.hpp"
 
-
 namespace{
 
 class audio_backend : public utki::destructable{
@@ -33,7 +32,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Creating engine object failed");
 			}
 
-            utki::ScopeExit scopeExit([this](){
+            utki::scope_exit scopeExit([this](){
                 this->destroy();
             });
 
@@ -63,8 +62,6 @@ class audio_backend : public utki::destructable{
 		Engine& operator=(const Engine&) = delete;
 	} engine;
 	
-	
-	
 	struct OutputMix{
 		SLObjectItf object;
 		
@@ -73,7 +70,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Creating output mix object failed");
 			}
 
-            utki::ScopeExit scopeExit([this](){
+            utki::scope_exit scopeExit([this](){
                 this->destroy();
             });
 
@@ -98,8 +95,6 @@ class audio_backend : public utki::destructable{
 		OutputMix& operator=(const OutputMix&) = delete;
 	} outputMix;
 	
-	
-	
 	struct Player{
 		audio_backend& backend;
 		
@@ -113,7 +108,6 @@ class audio_backend : public utki::destructable{
 				bufferQueue;
 
         std::array<std::vector<std::uint8_t>, 2> bufs;
-	
 	
 		// this callback handler is called every time a buffer finishes playing
 		static void Callback(
@@ -161,8 +155,6 @@ class audio_backend : public utki::destructable{
                         )
                 );
 		}
-		
-		
 		
 		Player(audio_backend& backend, Engine& engine, OutputMix& outputMix, unsigned bufferSizeFrames, audout::format format) :
 				backend(backend)
@@ -234,7 +226,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Creating player object failed");
 			}
 
-            utki::ScopeExit scopeExit([this](){
+            utki::scope_exit scopeExit([this](){
                 this->destroy();
             });
 
@@ -292,7 +284,6 @@ class audio_backend : public utki::destructable{
 		Player& operator=(const Player&);
 	} player;
 
-
 public:
     void setPaused(bool pause){
         this->player.setPaused(pause);
@@ -331,8 +322,6 @@ public:
 		}
 	}
 
-	
-	
 	~audio_backend()noexcept{
 		// stop player playing
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
