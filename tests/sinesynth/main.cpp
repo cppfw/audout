@@ -1,6 +1,6 @@
 #include <utki/math.hpp>
 #include <utki/config.hpp>
-#include <nitki/Thread.hpp>
+#include <nitki/thread.hpp>
 
 #include "../../src/audout/player.hpp"
 
@@ -43,7 +43,7 @@ void play(audout::format format){
 	audout::player p(format, 1000, &pl);
 	p.set_paused(false);
 
-	nitki::Thread::sleep(2000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 }
 
 

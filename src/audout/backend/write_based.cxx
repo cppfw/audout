@@ -62,13 +62,13 @@ private:
 //				TRACE(<< "Backend loop paused" << std::endl)
 				ws.wait();
 				
-				auto m = this->queue.peekMsg();
+				auto m = this->queue.pop_front();
 				ASSERT(m)
 				m();
 				continue;
 			}
 			
-			while(auto m = this->queue.peekMsg()){
+			while(auto m = this->queue.pop_front()){
 				m();
 			}
 
