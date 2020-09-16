@@ -1,6 +1,6 @@
 nuget{
 	nuspec{
-		id = audout;
+		id = libaudout;
 		version : $(version);
 		title: C++ audio library;
 		authors: {Ivan Gagis};
