@@ -20,7 +20,7 @@ nuget{
 		packages : {
 			libutki/1.0.22;
 			libnitki/1.0.13;
-			libpogodi/1.0.10;
+			libopros/1.0.39;
 		};
 	}
 	files {
