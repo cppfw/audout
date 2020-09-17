@@ -1,3 +1,9 @@
+libaudout (0.3.29) unstable; urgency=medium
+
+  * msvs: remove obsolete dependency on libpogodi
+
+ -- Ivan Gagis <igagis@gmail.com>  Thu, 17 Sep 2020 23:04:53 +0300
+
 libaudout (0.3.28) unstable; urgency=medium
 
   * msvs package rename to libaudout
