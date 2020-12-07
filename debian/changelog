@@ -1,3 +1,9 @@
+libaudout (0.3.30) unstable; urgency=medium
+
+  * github actions
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 07 Dec 2020 19:17:33 +0200
+
 libaudout (0.3.29) unstable; urgency=medium
 
   * msvs: remove obsolete dependency on libpogodi
