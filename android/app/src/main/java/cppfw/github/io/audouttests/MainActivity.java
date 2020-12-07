@@ -1,4 +1,4 @@
-package igagis.github.io.audouttests;
+package cppfw.github.io.audouttests;
 
 import android.app.Activity;
 

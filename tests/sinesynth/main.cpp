@@ -92,7 +92,7 @@ void test(){
 
 #if M_OS_NAME == M_OS_NAME_ANDROID
 
-JNIEXPORT void JNICALL Java_igagis_github_io_audouttests_MainActivity_test(
+JNIEXPORT void JNICALL Java_cppfw_github_io_audouttests_MainActivity_test(
 		JNIEnv *env,
 		jclass clazz,
 		jstring chars
@@ -110,9 +110,9 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
     }
 
     static JNINativeMethod methods[] = {
-            {"test", "()V", (void*)&Java_igagis_github_io_audouttests_MainActivity_test},
+            {"test", "()V", (void*)&Java_cppfw_github_io_audouttests_MainActivity_test},
     };
-    jclass clazz = env->FindClass("igagis/github/io/audouttests/MainActivity");
+    jclass clazz = env->FindClass("cppfw/github/io/audouttests/MainActivity");
     ASSERT_ALWAYS(clazz)
     if(env->RegisterNatives(clazz, methods, 1) < 0){
         ASSERT_ALWAYS(false)
