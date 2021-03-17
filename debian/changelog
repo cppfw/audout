@@ -1,3 +1,9 @@
+libaudout (0.3.32) unstable; urgency=medium
+
+  * msvs: disable whole program optimization
+
+ -- Ivan Gagis <igagis@gmail.com>  Wed, 17 Mar 2021 15:09:13 +0200
+
 libaudout (0.3.31) unstable; urgency=medium
 
   * disable ubuntu eoan build
