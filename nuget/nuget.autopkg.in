@@ -31,20 +31,20 @@ nuget{
 	}
 	dependencies {
 		packages : {
-			libutki/1.0.22;
-			libnitki/1.0.13;
-			libopros/1.0.39;
+			libutki/1.0.124;
+			libnitki/1.0.41;
+			libopros/1.0.46;
 		};
 	}
 	files {
-		//this is needed to put headers in the base folder
+		// this is needed to put headers in the base folder
 		nestedInclude: {
 			#destination = ${d_include}audout;
 			"..\src\audout\**\*.hpp"
 		};
 
 		// ======== v140 ========
-
+/*
 		[x86,v140,release] {
 			lib: ..\msvs_solution\v140_Release\audout.lib;
 		}
@@ -57,7 +57,7 @@ nuget{
 		[x64,v140,debug] {
 			lib: ..\msvs_solution\x64\v140_Debug\audout.lib;
 		}
-
+*/
 		// ======== v141 ========
 /*
 		[x86,v141,release] {
