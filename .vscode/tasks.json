@@ -9,21 +9,24 @@
 			"command": "make autojobs=true",
 			"problemMatcher": [
 				"$gcc"
-			]
+			],
+			"group": "build"
 		},
 		{
-			"label": "build_debug",
+			"label": "build_dbg",
 			"type": "shell",
-			"command": "make autojobs=true debug=true",
+			"command": "make autojobs=true config=dbg",
 			"problemMatcher": [
 				"$gcc"
-			]
+			],
+			"group": "build"
 		},
 		{
-			"label": "clean",
+			"label": "clean-all",
 			"type": "shell",
-			"command": "make clean",
-			"problemMatcher": []
+			"command": "make clean-all",
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }
