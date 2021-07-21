@@ -16,4 +16,6 @@ else ifeq ($(os), macosx)
     this_ldlibs += -framework AudioUnit
 endif
 
+this_ldlibs += lutki
+
 $(eval $(prorab-build-lib))
