@@ -1,3 +1,9 @@
+libaudout (0.3.36) unstable; urgency=medium
+
+  * xcode: static framework
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 08 Nov 2021 17:21:38 +0200
+
 libaudout (0.3.35) unstable; urgency=medium
 
   * use altest make in homebrew formulae
