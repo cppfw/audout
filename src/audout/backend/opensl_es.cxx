@@ -72,7 +72,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Obtaining Engine interface failed");
 			}
 
-            scopeExit.reset();
+			scopeExit.release();
 		}
 		
 		~Engine()noexcept{
@@ -105,7 +105,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Realizing output mix object failed");
 			}
 
-            scopeExit.reset();
+			scopeExit.release();
 		}
 		
 		~OutputMix()noexcept{
@@ -281,7 +281,7 @@ class audio_backend : public utki::destructable{
 				throw std::runtime_error("OpenSLES: Registering callback on the buffer queue failed");
 			}
 
-            scopeExit.reset();
+			scopeExit.release();
 		}
 		
 		~Player()noexcept{
