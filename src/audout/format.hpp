@@ -26,6 +26,8 @@ SOFTWARE.
 
 #pragma once
 
+// TODO: doxygen all
+
 namespace audout{
 
 enum class frame{
@@ -67,7 +69,5 @@ public:
 		return 2 * this->num_channels();
 	}
 };
-
-
 
 }

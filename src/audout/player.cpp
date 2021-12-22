@@ -41,18 +41,17 @@ SOFTWARE.
 #	error "Unknown OS"
 #endif
 
-
 using namespace audout;
-
 
 utki::intrusive_singleton<player>::T_Instance player::instance = nullptr;
 
-
-
-player::player(format output_format, uint32_t num_buffer_frames, audout::listener* listener) :
-			backend(new audio_backend(output_format, num_buffer_frames, listener))
+player::player(
+		format output_format,
+		uint32_t num_buffer_frames,
+		audout::listener* listener
+	) :
+		backend(std::make_unique<audio_backend>(output_format, num_buffer_frames, listener))
 {}
-
 
 void player::set_paused(bool pause){
     static_cast<audio_backend*>(this->backend.get())->setPaused(pause);
