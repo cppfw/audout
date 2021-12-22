@@ -33,7 +33,6 @@ SOFTWARE.
 
 #include "write_based.cxx"
 
-
 namespace{
 
 class audio_backend : public write_based, public utki::destructable{

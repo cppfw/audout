@@ -38,7 +38,10 @@ SOFTWARE.
 
 namespace{
 
-class audio_backend : public write_based, public utki::destructable{
+class audio_backend :
+		public write_based,
+		public utki::destructable
+{
 	struct Device{
 		snd_pcm_t *handle;
 		
@@ -109,7 +112,6 @@ public:
 		}
 		return err;
 	}
-
 
 	void write(const utki::span<std::int16_t> buf)override{
 		ASSERT(buf.size() % this->frame_size == 0)
@@ -219,8 +221,6 @@ public:
 			throw std::runtime_error("cannot set parameters");
 		}
 	}
-
-	
 
 	void SetSwParams(unsigned bufferSizeFrames){
 		struct SwParams{

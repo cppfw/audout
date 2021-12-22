@@ -33,7 +33,6 @@ SOFTWARE.
 
 #include "../player.hpp"
 
-
 namespace{
 
 class write_based{

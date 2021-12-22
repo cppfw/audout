@@ -275,7 +275,7 @@ class audio_backend : public utki::destructable{
 			if((*this->bufferQueue)->RegisterCallback(
 					this->bufferQueue,
 					&Callback,
-					this //c ontext to be passed to the callback
+					this // context to be passed to the callback
 				) != SL_RESULT_SUCCESS)
 			{
 				throw std::runtime_error("OpenSLES: Registering callback on the buffer queue failed");
@@ -353,7 +353,7 @@ public:
 		SLresult res = (*player.play)->SetPlayState(player.play, SL_PLAYSTATE_STOPPED);
 		ASSERT(res == SL_RESULT_SUCCESS);
 		
-		//TODO: make sure somehow that the callback will not be called anymore
+		// TODO: make sure somehow that the callback will not be called anymore
 	}
 };
 
