@@ -40,10 +40,10 @@ constexpr inline unsigned num_channels(frame frame_type)noexcept{
 }
 
 enum class rate{
-	hz11025 = 11025,
-	hz22050 = 22050,
-	hz44100 = 44100,
-	hz48000 = 48000
+	hz_11025 = 11025,
+	hz_22050 = 22050,
+	hz_44100 = 44100,
+	hz_48000 = 48000
 };
 
 class format{
