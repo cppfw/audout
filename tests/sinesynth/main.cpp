@@ -50,43 +50,43 @@ void play(audout::format format){
 void test(){
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
-		play(audout::format(audout::frame::mono, audout::rate::hz11025));
+		play(audout::format(audout::frame::mono, audout::rate::hz_11025));
 		TRACE_ALWAYS(<< "finished playing" << std::endl)
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
-		play(audout::format(audout::frame::stereo, audout::rate::hz11025));
+		play(audout::format(audout::frame::stereo, audout::rate::hz_11025));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
-		play(audout::format(audout::frame::mono, audout::rate::hz22050));
+		play(audout::format(audout::frame::mono, audout::rate::hz_22050));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
-		play(audout::format(audout::frame::stereo, audout::rate::hz22050));
+		play(audout::format(audout::frame::stereo, audout::rate::hz_22050));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
-		play(audout::format(audout::frame::mono, audout::rate::hz44100));
+		play(audout::format(audout::frame::mono, audout::rate::hz_44100));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
-		play(audout::format(audout::frame::stereo, audout::rate::hz44100));
+		play(audout::format(audout::frame::stereo, audout::rate::hz_44100));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
-		play(audout::format(audout::frame::mono, audout::rate::hz48000));
+		play(audout::format(audout::frame::mono, audout::rate::hz_48000));
 	}
 
 	{
 		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 48000" << std::endl)
-		play(audout::format(audout::frame::stereo, audout::rate::hz48000));
+		play(audout::format(audout::frame::stereo, audout::rate::hz_48000));
 	}
 }
 
