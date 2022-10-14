@@ -113,9 +113,9 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
             {"test", "()V", (void*)&Java_cppfw_github_io_audouttests_MainActivity_test},
     };
     jclass clazz = env->FindClass("cppfw/github/io/audouttests/MainActivity");
-    ASSERT_ALWAYS(clazz)
+    utki::assert(clazz, SL);
     if(env->RegisterNatives(clazz, methods, 1) < 0){
-        ASSERT_ALWAYS(false)
+        utki::assert(false, SL);
     }
 
     return JNI_VERSION_1_6;
