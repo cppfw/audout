@@ -55,7 +55,7 @@ class WinEvent : public opros::waitable{
 	virtual void set_waiting_flags(utki::flags<opros::ready> wait_for)override{
 		// Only possible flag values are 'read' or 0 (not ready)
 		if(!(wait_for & (~utki::make_flags({opros::ready::read}))).is_clear()){
-			ASSERT_INFO(false, "wait_for = " << wait_for)
+			ASSERT(false, [&](auto&o){o << "wait_for = " << wait_for;})
 			throw std::invalid_argument("WinEvent::set_waiting_flags(): only 'read' or no flags are allowed");
 		}
 
