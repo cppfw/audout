@@ -86,13 +86,13 @@ public:
 	}
 
 	int RecoverALSAFromXrun(int err){
-		TRACE(<< "stream recovery" << std::endl)
+		LOG([&](auto&o){o << "stream recovery" << std::endl;})
 		if(err == -EPIPE){ // underrun
 			err = snd_pcm_prepare(this->device.handle);
 			if (err < 0){
-				TRACE(
-						<< "Can't recovery from underrun, prepare failed, error code ="
-						<< snd_strerror(err) << std::endl
+				LOG(
+						[&](auto&o){o << "Can't recovery from underrun, prepare failed, error code ="
+						<< snd_strerror(err) << std::endl;}
 					)
 			}
 			return 0;
@@ -102,9 +102,9 @@ public:
 			if(err < 0){
 				err = snd_pcm_prepare(this->device.handle);
 				if (err < 0){
-					TRACE(
-							<< "Can't recovery from suspend, prepare failed, error code ="
-							<< snd_strerror(err) << std::endl
+					LOG(
+							[&](auto&o){o << "Can't recovery from suspend, prepare failed, error code ="
+							<< snd_strerror(err) << std::endl;}
 						)
 				}
 			}
@@ -146,7 +146,7 @@ public:
 			
 			HwParams(){
 				if(snd_pcm_hw_params_malloc(&this->params) < 0){
-					TRACE(<< "cannot allocate hardware parameter structure" << std::endl)
+					LOG([&](auto&o){o << "cannot allocate hardware parameter structure" << std::endl;})
 					throw std::runtime_error("cannot allocate hardware parameter structure");
 				}
 			}
@@ -157,30 +157,30 @@ public:
 		} hw;
 
 		if(snd_pcm_hw_params_any(this->device.handle, hw.params) < 0){
-			TRACE(<< "cannot initialize hardware parameter structure" << std::endl)
+			LOG([&](auto&o){o << "cannot initialize hardware parameter structure" << std::endl;})
 			throw std::runtime_error("cannot initialize hardware parameter structure");
 		}
 
 		if(snd_pcm_hw_params_set_access(this->device.handle, hw.params, SND_PCM_ACCESS_RW_INTERLEAVED) < 0){
-			TRACE(<< "cannot set access type" << std::endl)
+			LOG([&](auto&o){o << "cannot set access type" << std::endl;})
 			throw std::runtime_error("cannot set access type");
 		}
 
 		if(snd_pcm_hw_params_set_format(this->device.handle, hw.params, SND_PCM_FORMAT_S16_LE) < 0){
-			TRACE(<< "cannot set sample format" << std::endl)
+			LOG([&](auto&o){o << "cannot set sample format" << std::endl;})
 			throw std::runtime_error("cannot set sample format");
 		}
 
 		{
 			unsigned val = format.frequency();
 			if(snd_pcm_hw_params_set_rate_near(this->device.handle, hw.params, &val, 0) < 0){
-				TRACE(<< "cannot set sample rate" << std::endl)
+				LOG([&](auto&o){o << "cannot set sample rate" << std::endl;})
 				throw std::runtime_error("cannot set sample rate");
 			}
 		}
 
 		if(snd_pcm_hw_params_set_channels(this->device.handle, hw.params, format.num_channels()) < 0){
-			TRACE(<< "cannot set channel count" << std::endl)
+			LOG([&](auto&o){o << "cannot set channel count" << std::endl;})
 			throw std::runtime_error("cannot set channel count");
 		}
 
@@ -196,7 +196,7 @@ public:
 				) < 0
 			)
 			{
-				TRACE(<< "could not set period size" << std::endl)
+				LOG([&](auto&o){o << "could not set period size" << std::endl;})
 				throw std::runtime_error("could not set period size");
 			}
 
@@ -208,16 +208,16 @@ public:
 			unsigned int numPeriods = 2;
 			int err = snd_pcm_hw_params_set_periods_near(this->device.handle, hw.params, &numPeriods, NULL);
 			if(err < 0){
-				TRACE(<< "could not set number of periods, err = " << err << std::endl)
+				LOG([&](auto&o){o << "could not set number of periods, err = " << err << std::endl;})
 				throw std::runtime_error("could not set number of periods");
 			}
-			TRACE(<< "numPeriods = " << numPeriods << std::endl)
+			LOG([&](auto&o){o << "numPeriods = " << numPeriods << std::endl;})
 		}
 
 
 		// set hw params
 		if(snd_pcm_hw_params(this->device.handle, hw.params) < 0){
-			TRACE(<< "cannot set parameters" << std::endl)
+			LOG([&](auto&o){o << "cannot set parameters" << std::endl;})
 			throw std::runtime_error("cannot set parameters");
 		}
 	}
@@ -227,7 +227,7 @@ public:
 			snd_pcm_sw_params_t *params;
 			SwParams(){
 				if(snd_pcm_sw_params_malloc(&this->params) < 0){
-					TRACE(<< "cannot allocate software parameters structure" << std::endl)
+					LOG([&](auto&o){o << "cannot allocate software parameters structure" << std::endl;})
 					throw std::runtime_error("cannot allocate software parameters structure");
 				}
 			}
@@ -237,24 +237,24 @@ public:
 		} sw;
 
 		if(snd_pcm_sw_params_current(this->device.handle, sw.params) < 0){
-			TRACE(<< "cannot initialize software parameters structure" << std::endl)
+			LOG([&](auto&o){o << "cannot initialize software parameters structure" << std::endl;})
 			throw std::runtime_error("cannot initialize software parameters structure");
 		}
 
 		// tell ALSA to wake us up whenever 'buffer size' frames of playback data can be delivered
 		if(snd_pcm_sw_params_set_avail_min(this->device.handle, sw.params, bufferSizeFrames) < 0){
-			TRACE(<< "cannot set minimum available count" << std::endl)
+			LOG([&](auto&o){o << "cannot set minimum available count" << std::endl;})
 			throw std::runtime_error("cannot set minimum available count");
 		}
 
 		// tell ALSA to start playing on first data write
 		if(snd_pcm_sw_params_set_start_threshold(this->device.handle, sw.params, 0) < 0){
-			TRACE(<< "cannot set start mode" << std::endl)
+			LOG([&](auto&o){o << "cannot set start mode" << std::endl;})
 			throw std::runtime_error("cannot set start mode");
 		}
 
 		if(snd_pcm_sw_params(this->device.handle, sw.params) < 0){
-			TRACE(<< "cannot set software parameters" << std::endl)
+			LOG([&](auto&o){o << "cannot set software parameters" << std::endl;})
 			throw std::runtime_error("cannot set software parameters");
 		}
 	}

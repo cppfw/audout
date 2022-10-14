@@ -50,7 +50,7 @@ class audio_backend : public write_based, public utki::destructable{
 				&error
 			) < 0)
 		{
-			TRACE(<< "pa_simple_write(): error (" << pa_strerror(error) << ")" << std::endl)
+			LOG([&](auto&o){o << "pa_simple_write(): error (" << pa_strerror(error) << ")" << std::endl;})
 		}
 	}
 	
@@ -62,7 +62,7 @@ public:
 		) :
 			write_based(listener, bufferSizeFrames * outputFormat.num_channels())
 	{
-		TRACE(<< "opening device" << std::endl)
+		LOG([&](auto&o){o << "opening device" << std::endl;})
 
 		pa_sample_spec ss;
 		ss.format = PA_SAMPLE_S16NE;//Native endian
@@ -95,7 +95,7 @@ public:
 			);
 
 		if(!this->handle){
-			TRACE(<< "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl)
+			LOG([&](auto&o){o << "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl;})
 			std::stringstream ss;
 			ss << "error opening PulseAudio connection: " << pa_strerror(error);
 			throw std::runtime_error(ss.str());

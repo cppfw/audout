@@ -246,7 +246,7 @@ class audio_backend : public utki::destructable{
 				0 // no flags
 			) != DS_OK)
 		{
-			TRACE(<< "DirectSound thread: locking buffer failed" << std::endl)
+			LOG([&](auto&o){o << "DirectSound thread: locking buffer failed" << std::endl;})
 			return;
 		}
 
@@ -257,7 +257,7 @@ class audio_backend : public utki::destructable{
 
 		// unlock the buffer
 		if(this->dsb.dsb->Unlock(addr, size, nullptr, 0) != DS_OK){
-			TRACE(<< "DirectSound thread: unlocking buffer failed" << std::endl)
+			LOG([&](auto&o){o << "DirectSound thread: unlocking buffer failed" << std::endl;})
 			ASSERT(false)
 		}
 	}
