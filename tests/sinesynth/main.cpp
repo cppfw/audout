@@ -49,43 +49,43 @@ void play(audout::format format){
 
 void test(){
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Mono 11025" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Mono 11025" << std::endl;});
 		play(audout::format(audout::frame::mono, audout::rate::hz_11025));
-		TRACE_ALWAYS(<< "finished playing" << std::endl)
+		utki::log([&](auto&o){o << "finished playing" << std::endl;});
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 11025" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Stereo 11025" << std::endl;});
 		play(audout::format(audout::frame::stereo, audout::rate::hz_11025));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Mono 22050" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Mono 22050" << std::endl;});
 		play(audout::format(audout::frame::mono, audout::rate::hz_22050));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 22050" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Stereo 22050" << std::endl;});
 		play(audout::format(audout::frame::stereo, audout::rate::hz_22050));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Mono 44100" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Mono 44100" << std::endl;});
 		play(audout::format(audout::frame::mono, audout::rate::hz_44100));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 44100" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Stereo 44100" << std::endl;});
 		play(audout::format(audout::frame::stereo, audout::rate::hz_44100));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Mono 48000" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Mono 48000" << std::endl;});
 		play(audout::format(audout::frame::mono, audout::rate::hz_48000));
 	}
 
 	{
-		TRACE_ALWAYS(<< "Opening audio playback device: Stereo 48000" << std::endl)
+		utki::log([&](auto&o){o << "Opening audio playback device: Stereo 48000" << std::endl;});
 		play(audout::format(audout::frame::stereo, audout::rate::hz_48000));
 	}
 }
@@ -102,7 +102,7 @@ JNIEXPORT void JNICALL Java_cppfw_github_io_audouttests_MainActivity_test(
 }
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved){
-    TRACE_ALWAYS(<< "JNI_OnLoad(): invoked" << std::endl)
+    utki::log([&](auto&o){o << "JNI_OnLoad(): invoked" << std::endl;});
 
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
