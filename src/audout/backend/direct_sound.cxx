@@ -56,8 +56,8 @@ class WinEvent : public opros::waitable{
 		}
 	}
 
-	utki::flags<ready> get_readiness_flags()override{
-		utki::flags<ready> flags{false};
+	utki::flags<opros::ready> get_readiness_flags()override{
+		utki::flags<opros::ready> flags{false};
 		switch(WaitForSingleObject(this->handle, 0)){
 			case WAIT_OBJECT_0: // event is signaled
 				flags.set(opros::ready::read);
@@ -256,6 +256,7 @@ class audio_backend : public utki::destructable{
 		}
 	}
 	
+	// TODO: rewrite using nitki::loop_thread?
 	void run(){
 		opros::wait_set ws(3);
 		
@@ -263,25 +264,24 @@ class audio_backend : public utki::destructable{
 		ws.add(this->event1, {opros::ready::read});
 		ws.add(this->event2, {opros::ready::read});
 		
+		std::array<opros::event_info, 3> triggered;
 		while(!this->quitFlag){
 //			TRACE(<< "audio_backend loop" << std::endl)
 			
-			ws.wait();
+			auto num_triggered = ws.wait(triggered);
 			
-			if(this->queue.flags().get(opros::ready::read)){
-				while(auto m = this->queue.pop_front()){
-					m();
+			for(const auto& t : utki::make_span(triggered.data(), num_triggered)){
+				if(t.object == &this->queue){
+					while(auto m = this->queue.pop_front()){
+						m();
+					}
+				}else if(t.object == &this->event1){
+					// if first buffer playing has started, then fill the second one
+					this->fillDSBuffer(1);
+				}else if(t.object == &this->event2){
+					// if second buffer playing has started, then fill the first one
+					this->fillDSBuffer(0);
 				}
-			}
-
-			// if first buffer playing has started, then fill the second one
-			if(this->event1.flags().get(opros::ready::read)){
-				this->fillDSBuffer(1);
-			}
-			
-			// if second buffer playing has started, then fill the first one
-			if(this->event2.flags().get(opros::ready::read)){
-				this->fillDSBuffer(0);
 			}
 		}
 		
