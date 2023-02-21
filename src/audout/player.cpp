@@ -43,7 +43,7 @@ SOFTWARE.
 
 using namespace audout;
 
-utki::intrusive_singleton<player>::T_Instance player::instance = nullptr;
+utki::intrusive_singleton<player>::instance_type player::instance = nullptr;
 
 player::player(
 		format output_format,

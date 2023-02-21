@@ -85,7 +85,7 @@ private:
 			
 			if(this->isPaused){
 //				TRACE(<< "Backend loop paused" << std::endl)
-				ws.wait();
+				ws.wait(nullptr);
 				
 				auto m = this->queue.pop_front();
 				ASSERT(m)

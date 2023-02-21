@@ -46,7 +46,7 @@ public:
 //TODO: doxygen
 class player : public utki::intrusive_singleton<player>{
 	friend class utki::intrusive_singleton<player>;
-	static utki::intrusive_singleton<player>::T_Instance instance;
+	static utki::intrusive_singleton<player>::instance_type instance;
 
 	std::unique_ptr<utki::destructable> backend;
 
