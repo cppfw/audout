@@ -48,60 +48,54 @@ SOFTWARE.
 namespace{
 
 class WinEvent : public opros::waitable{
-	HANDLE eventForWaitable;
-
-	utki::flags<opros::ready> waiting_flags;
-
-	virtual void set_waiting_flags(utki::flags<opros::ready> wait_for)override{
+	void set_waiting_flags(utki::flags<opros::ready> wait_for)override{
 		// Only possible flag values are 'read' or 0 (not ready)
 		if(!(wait_for & (~utki::make_flags({opros::ready::read}))).is_clear()){
 			ASSERT(false, [&](auto&o){o << "wait_for = " << wait_for;})
 			throw std::invalid_argument("WinEvent::set_waiting_flags(): only 'read' or no flags are allowed");
 		}
-
-		this->waiting_flags = wait_for;
 	}
 
-	bool check_signaled()override{
-		switch(WaitForSingleObject(this->eventForWaitable, 0)){
+	utki::flags<ready> get_readiness_flags()override{
+		utki::flags<ready> flags{false};
+		switch(WaitForSingleObject(this->handle, 0)){
 			case WAIT_OBJECT_0: // event is signaled
-				this->readiness_flags.set(opros::ready::read);
-				if(ResetEvent(this->eventForWaitable) == 0){
+				flags.set(opros::ready::read);
+				if(ResetEvent(this->handle) == 0){
 					ASSERT(false)
 					throw std::system_error(GetLastError(), std::generic_category(), "ResetEvent() failed");
 				}
 				break;
 			case WAIT_ABANDONED:
 			case WAIT_TIMEOUT: // event is not signalled
-				this->readiness_flags.clear(opros::ready::read);
 				break;
 			default:
 			case WAIT_FAILED:
 				throw std::system_error(GetLastError(), std::generic_category(), "WaitForSingleObject() failed");
 		}
 		
-		return !(this->waiting_flags & this->flags()).is_clear();
+		return flags;
 	}
 public:
-
-	HANDLE get_handle()override{
-		return this->eventForWaitable;
-	}
-	
-	WinEvent(){
-		this->eventForWaitable = CreateEvent(
-			nullptr, // security attributes
-			TRUE, // manual-reset
-			FALSE, // not signaled initially
-			nullptr // no name
-		);
-		if(this->eventForWaitable == 0){
-			throw std::system_error(GetLastError(), std::generic_category(), "CreateEvent() failed");
-		}
-	}
+	WinEvent() :
+		opros::waitable(
+			[](){
+				auto handle = CreateEvent(
+					nullptr, // security attributes
+					TRUE, // manual-reset
+					FALSE, // not signaled initially
+					nullptr // no name
+				);
+				if(handle == 0){
+					throw std::system_error(GetLastError(), std::generic_category(), "CreateEvent() failed");
+				}
+				return handle;
+			}()
+		)
+	{}
 	
 	virtual ~WinEvent()noexcept{
-		CloseHandle(this->eventForWaitable);
+		CloseHandle(this->handle);
 	}
 };
 
