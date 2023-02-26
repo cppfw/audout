@@ -60,7 +60,7 @@ public:
 	
 private:
 	
-	std::optional<uint32_t> on_loop(utki::span<const opros::event_info> triggered)override{
+	std::optional<uint32_t> on_loop()override{
 		if(this->isPaused){
 			return {};
 		}
