@@ -260,9 +260,9 @@ class audio_backend : public utki::destructable{
 	void run(){
 		opros::wait_set ws(3);
 		
-		ws.add(this->queue, {opros::ready::read});
-		ws.add(this->event1, {opros::ready::read});
-		ws.add(this->event2, {opros::ready::read});
+		ws.add(this->queue, {opros::ready::read}, &this->queue);
+		ws.add(this->event1, {opros::ready::read}, &this->event1);
+		ws.add(this->event2, {opros::ready::read}, &this->event2);
 		
 		std::array<opros::event_info, 3> triggered;
 		while(!this->quitFlag){
@@ -271,14 +271,14 @@ class audio_backend : public utki::destructable{
 			auto num_triggered = ws.wait(triggered);
 			
 			for(const auto& t : utki::make_span(triggered.data(), num_triggered)){
-				if(t.object == &this->queue){
+				if(t.user_data == &this->queue){
 					while(auto m = this->queue.pop_front()){
 						m();
 					}
-				}else if(t.object == &this->event1){
+				}else if(t.user_data == &this->event1){
 					// if first buffer playing has started, then fill the second one
 					this->fillDSBuffer(1);
-				}else if(t.object == &this->event2){
+				}else if(t.user_data == &this->event2){
 					// if second buffer playing has started, then fill the first one
 					this->fillDSBuffer(0);
 				}
