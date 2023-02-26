@@ -30,21 +30,16 @@ SOFTWARE.
 #include <thread>
 
 #include <nitki/queue.hpp>
+#include <nitki/loop_thread.hpp>
 
 #include "../player.hpp"
 
 namespace{
 
-class write_based{
+class write_based : public nitki::loop_thread{
 	audout::listener* listener;
 	
 	std::vector<std::int16_t> playBuf;
-	
-	nitki::queue queue;
-
-	bool quitFlag = false;
-
-	std::thread thread;
 
 protected:
 	bool isPaused = true;
@@ -53,20 +48,10 @@ protected:
 			audout::listener* listener,
 			size_t playBufSizeInSamples
 		) :
+			nitki::loop_thread(0),
 			listener(listener),
 			playBuf(playBufSizeInSamples)
 	{}
-	
-	void stopThread()noexcept{
-		if(this->thread.joinable()){
-			this->queue.push_back([this](){this->quitFlag = true;});
-			this->thread.join();
-		}
-	}
-	
-	void startThread(){
-		this->thread = std::thread([this](){this->run();});
-	}
 	
 	virtual void write(const utki::span<int16_t> buf) = 0;
 	
@@ -75,39 +60,22 @@ public:
 	
 private:
 	
-	void run(){
-		opros::wait_set ws(1);
-		
-		ws.add(this->queue, {opros::ready::read});
-		
-		while(!this->quitFlag){
-//			TRACE(<< "Backend loop" << std::endl)
-			
-			if(this->isPaused){
-//				TRACE(<< "Backend loop paused" << std::endl)
-				ws.wait(nullptr);
-				
-				auto m = this->queue.pop_front();
-				ASSERT(m)
-				m();
-				continue;
-			}
-			
-			while(auto m = this->queue.pop_front()){
-				m();
-			}
-
-			this->listener->fill(utki::make_span(this->playBuf));
-			
-			this->write(utki::make_span(this->playBuf));
+	std::optional<uint32_t> on_loop(utki::span<const opros::event_info> triggered)override{
+		if(this->isPaused){
+			return {};
 		}
-		
-		ws.remove(this->queue);
+
+		this->listener->fill(utki::make_span(this->playBuf));
+
+		// this call will block if play buffer is full			
+		this->write(utki::make_span(this->playBuf));
+
+		return 0;
 	}
 	
 public:
 	void setPaused(bool pause){
-		this->queue.push_back([this, pause](){
+		this->push_back([this, pause](){
 			this->isPaused = pause;
 		});
 	}

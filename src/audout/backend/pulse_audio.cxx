@@ -101,11 +101,12 @@ public:
 			throw std::runtime_error(ss.str());
 		}
 		
-		this->startThread();
+		this->start();
 	}
 	
 	virtual ~audio_backend()noexcept{
-		this->stopThread();
+		this->quit();
+		this->join();
 		
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);
