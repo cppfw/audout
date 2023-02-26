@@ -264,13 +264,12 @@ class audio_backend : public utki::destructable{
 		ws.add(this->event1, {opros::ready::read}, &this->event1);
 		ws.add(this->event2, {opros::ready::read}, &this->event2);
 		
-		std::array<opros::event_info, 3> triggered;
 		while(!this->quitFlag){
 //			TRACE(<< "audio_backend loop" << std::endl)
 			
-			auto num_triggered = ws.wait(triggered);
+			ws.wait();
 			
-			for(const auto& t : utki::make_span(triggered.data(), num_triggered)){
+			for(const auto& t : ws.get_triggered()){
 				if(t.user_data == &this->queue){
 					while(auto m = this->queue.pop_front()){
 						m();
