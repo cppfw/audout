@@ -1,3 +1,9 @@
+libaudout (0.3.42) unstable; urgency=medium
+
+  * ci: use https
+
+ -- Ivan Gagis <igagis@gmail.com>  Sat, 09 Dec 2023 23:45:21 +0200
+
 libaudout (0.3.41) unstable; urgency=medium
 
   * relink
