@@ -28,6 +28,7 @@ SOFTWARE.
 
 #include <utki/config.hpp>
 #include <utki/destructable.hpp>
+#include <utki/util.hpp>
 
 #include <opros/wait_set.hpp>
 
