@@ -24,9 +24,12 @@ Description: debugging symbols for libaudout$(soname) package.
 
 Package: libaudout-dev
 Section: devel
-Architecture: all
-Depends: libaudout$(soname) (= ${binary:Version}), libaudout$(soname)-dbg (= ${binary:Version}), ${misc:Depends},
-                            libpulse-dev, libutki-dev, libnitki-dev
+Architecture: any
+Depends: libaudout$(soname) (= ${binary:Version}), ${misc:Depends},
+        libaudout$(soname)-dbg (= ${binary:Version}),
+        libpulse-dev,
+        libutki-dev,
+        libnitki-dev
 Suggests: libaudout-doc
 Description: cross-platform C++ audio library.
  Audio library.
