@@ -1,3 +1,9 @@
+libaudout (0.3.43) unstable; urgency=medium
+
+  * aptian
+
+ -- Ivan Gagis <igagis@gmail.com>  Fri, 01 Mar 2024 14:55:46 +0200
+
 libaudout (0.3.42) unstable; urgency=medium
 
   * ci: use https
