@@ -44,7 +44,7 @@ class audio_backend : public utki::destructable{
 			//open the default audio device
 			AudioComponentDescription desc;
 			desc.componentType = kAudioUnitType_Output;
-#if M_OS_NAME == M_OS_NAME_IOS
+#if CFG_OS_NAME == CFG_OS_NAME_IOS
 			desc.componentSubType = kAudioUnitSubType_GenericOutput;
 #else
 			desc.componentSubType = kAudioUnitSubType_DefaultOutput;

@@ -26,7 +26,6 @@ SOFTWARE.
 
 #pragma once
 
-#include <utki/config.hpp>
 #include <utki/singleton.hpp>
 #include <utki/destructable.hpp>
 #include <utki/span.hpp>

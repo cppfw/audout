@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include <nitki/queue.hpp>
 
-#if M_OS != M_OS_WINDOWS
+#if CFG_OS != CFG_OS_WINDOWS
 #	error "compiling in non-Windows environment"
 #endif
 

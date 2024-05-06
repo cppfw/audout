@@ -26,16 +26,18 @@ SOFTWARE.
 
 #include "player.hpp"
 
-#if M_OS == M_OS_WINDOWS
+#include <utki/config.hpp>
+
+#if CFG_OS == CFG_OS_WINDOWS
 #	include "backend/direct_sound.cxx"
-#elif M_OS == M_OS_LINUX
-#	if M_OS_NAME == M_OS_NAME_ANDROID
+#elif CFG_OS == CFG_OS_LINUX
+#	if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 #		include "backend/opensl_es.cxx"
 #	else
 #		include "backend/pulse_audio.cxx"
 // #		include "backend/alsa.cxx"
 #	endif
-#elif M_OS == M_OS_MACOSX
+#elif CFG_OS == CFG_OS_MACOSX
 #	include "backend/apple_coreaudio.cxx"
 #else
 #	error "Unknown OS"

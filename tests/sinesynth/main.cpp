@@ -4,7 +4,7 @@
 
 #include "../../src/audout/player.hpp"
 
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 #	include <jni.h>
 #endif
 
@@ -90,7 +90,7 @@ void test(){
 	}
 }
 
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 
 JNIEXPORT void JNICALL Java_cppfw_github_io_audouttests_MainActivity_test(
 		JNIEnv *env,

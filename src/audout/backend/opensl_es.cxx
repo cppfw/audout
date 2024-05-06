@@ -29,12 +29,13 @@ SOFTWARE.
 #include <vector>
 #include <array>
 
+#include <utki/config.hpp>
 #include <utki/util.hpp>
 #include <utki/destructable.hpp>
 
 #include <SLES/OpenSLES.h>
 
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 #	include <SLES/OpenSLES_Android.h>
 #include <cstdint>
 
@@ -126,7 +127,7 @@ class audio_backend : public utki::destructable{
 		
 		SLObjectItf object;
 		SLPlayItf play;
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 		SLAndroidSimpleBufferQueueItf
 #else
 		SLBufferQueueItf
@@ -137,7 +138,7 @@ class audio_backend : public utki::destructable{
 	
 		// this callback handler is called every time a buffer finishes playing
 		static void Callback(
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 				SLAndroidSimpleBufferQueueItf queue,
 				void *context
 #else
@@ -155,7 +156,7 @@ class audio_backend : public utki::destructable{
 			ASSERT(context)
 			Player* player = static_cast<Player*>(context);
 			
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 #else
 			ASSERT(buffer == &*player->bufs[0].begin())
 			ASSERT(bufferSize == player->bufs[0].size())
@@ -165,7 +166,7 @@ class audio_backend : public utki::destructable{
 			ASSERT(player->bufs.size() == 2)
 			std::swap(player->bufs[0], player->bufs[1]); // swap buffers, the 0th one is the buffer which is currently playing
 			
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 			SLresult res = (*queue)->Enqueue(queue, &*player->bufs[0].begin(), player->bufs[0].size());
 #else
 			SLresult res = (*queue)->Enqueue(queue, &*player->bufs[0].begin(), player->bufs[0].size(), SL_BOOLEAN_FALSE);
@@ -198,7 +199,7 @@ class audio_backend : public utki::destructable{
 			
 			//========================
 			// configure audio source
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 			SLDataLocator_AndroidSimpleBufferQueue bufferQueueStruct = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2}; //2 buffers in queue
 #else
 			SLDataLocator_BufferQueue bufferQueueStruct = {SL_DATALOCATOR_BUFFERQUEUE, 2}; // 2 buffers in queue
@@ -329,7 +330,7 @@ public:
 		this->setPaused(false);
 		
 		// enqueue the first buffer for playing, otherwise it will not start playing
-#if M_OS_NAME == M_OS_NAME_ANDROID
+#if CFG_OS_NAME == CFG_OS_NAME_ANDROID
 		SLresult res = (*this->player.bufferQueue)->Enqueue(
                 this->player.bufferQueue,
                 &*this->player.bufs[0].begin(),
