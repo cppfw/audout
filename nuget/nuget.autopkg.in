@@ -18,9 +18,9 @@ nuget{
 		title: C++ audio library;
 		authors: {Ivan Gagis};
 		owners: {Ivan Gagis};
-		licenseUrl: "https://raw.githubusercontent.com/cppfw/audout/master/LICENSE";
+		licenseUrl: "https://raw.githubusercontent.com/cppfw/audout/main/LICENSE";
 		projectUrl: "https://github.com/cppfw/audout";
-		iconUrl: "https://github.com/cppfw/audout/blob/master/logo.svg";
+		iconUrl: "https://github.com/cppfw/audout/blob/main/logo.svg";
 		requireLicenseAcceptance:false;
 		summary: C++ audio library;
 
