@@ -1,3 +1,9 @@
+libaudout (0.3.46) unstable; urgency=medium
+
+  * ubuntu noble build
+
+ -- Ivan Gagis <igagis@gmail.com>  Tue, 19 Nov 2024 23:41:08 +0200
+
 libaudout (0.3.45) unstable; urgency=medium
 
   * fix homebrew packaging
