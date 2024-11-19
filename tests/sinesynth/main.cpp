@@ -23,7 +23,7 @@ struct SinePlayer : public audout::listener{
 				);
 			this->time += 1 / decltype(this->time)(format.frequency());
 			for(unsigned i = 0; i != format.num_channels(); ++i){
-				ASSERT(buf.overlaps(dst))
+				ASSERT(utki::overlaps(buf, dst))
 				*dst = v;
 				++dst;
 			}
