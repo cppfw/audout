@@ -39,8 +39,14 @@ SOFTWARE.
 #include <cstring>
 #include <thread>
 
+// clang-format off
+
+// The initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
+// It should be included before dsound.h.
+#include <initguid.h>
 #include <dsound.h>
-#include <initguid.h> // The header file initguid.h is required to avoid the error message "undefined reference to `IID_IDirectSoundBuffer8'".
+
+// clang-format on
 
 #include "../player.hpp"
 
