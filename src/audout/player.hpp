@@ -26,24 +26,26 @@ SOFTWARE.
 
 #pragma once
 
-#include <utki/singleton.hpp>
 #include <utki/destructable.hpp>
+#include <utki/singleton.hpp>
 #include <utki/span.hpp>
 
 #include "format.hpp"
 
-namespace audout{
+namespace audout {
 
 //TODO: doxygen
-class listener{
+class listener
+{
 public:
-	virtual void fill(utki::span<int16_t> play_buffer)noexcept = 0;
-	
-	virtual ~listener()noexcept{}
+	virtual void fill(utki::span<int16_t> play_buffer) noexcept = 0;
+
+	virtual ~listener() noexcept {}
 };
 
 //TODO: doxygen
-class player : public utki::intrusive_singleton<player>{
+class player : public utki::intrusive_singleton<player>
+{
 	friend class utki::intrusive_singleton<player>;
 	static utki::intrusive_singleton<player>::instance_type instance;
 
@@ -58,11 +60,11 @@ public:
 	 * @param listener - callback for filling playing buffer.
 	 */
 	player(format output_format, uint32_t num_buffer_frames, listener* listener);
-	
+
 public:
-	virtual ~player()noexcept{}
-	
+	virtual ~player() noexcept {}
+
 	void set_paused(bool pause);
 };
 
-}
+} // namespace audout

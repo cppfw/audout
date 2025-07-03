@@ -26,46 +26,41 @@ SOFTWARE.
 
 #pragma once
 
-#include <utki/destructable.hpp>
-
-#include <pulse/simple.h>
 #include <pulse/error.h>
+#include <pulse/simple.h>
+#include <utki/destructable.hpp>
 
 #include "write_based.cxx"
 
-namespace{
+namespace {
 
-class audio_backend : public write_based, public utki::destructable{
-	pa_simple *handle;
-	
-	void write(const utki::span<std::int16_t> buf)override{
-//		ASSERT(buf.Size() == this->BufferSizeInBytes())
+class audio_backend : public write_based, public utki::destructable
+{
+	pa_simple* handle;
+
+	void write(const utki::span<std::int16_t> buf) override
+	{
+		//		ASSERT(buf.Size() == this->BufferSizeInBytes())
 
 		int error;
-		
-		if(pa_simple_write(
-				this->handle,
-				&*buf.begin(),
-				size_t(buf.size_bytes()),
-				&error
-			) < 0)
-		{
-			LOG([&](auto&o){o << "pa_simple_write(): error (" << pa_strerror(error) << ")" << std::endl;})
+
+		if (pa_simple_write(this->handle, &*buf.begin(), size_t(buf.size_bytes()), &error) < 0) {
+			LOG([&](auto& o) {
+				o << "pa_simple_write(): error (" << pa_strerror(error) << ")" << std::endl;
+			})
 		}
 	}
-	
+
 public:
-	audio_backend(
-			audout::format outputFormat,
-			uint32_t bufferSizeFrames,
-			audout::listener* listener
-		) :
-			write_based(listener, bufferSizeFrames * outputFormat.num_channels())
+	audio_backend(audout::format outputFormat, uint32_t bufferSizeFrames, audout::listener* listener) :
+		write_based(listener, bufferSizeFrames * outputFormat.num_channels())
 	{
-		LOG([&](auto&o){o << "opening device" << std::endl;})
+		LOG([&](auto& o) {
+			o << "opening device" << std::endl;
+		})
 
 		pa_sample_spec ss;
-		ss.format = PA_SAMPLE_S16NE;//Native endian
+		ss.format = PA_SAMPLE_S16NE; //Native endian
 		ss.channels = outputFormat.num_channels();
 		ss.rate = outputFormat.frequency();
 
@@ -76,41 +71,44 @@ public:
 		ba.minreq = std::uint32_t(-1);
 		ba.maxlength = std::uint32_t(-1);
 		ba.prebuf = std::uint32_t(-1);
-		
+
 		pa_channel_map cm;
 		pa_channel_map_init_auto(&cm, ss.channels, PA_CHANNEL_MAP_WAVEEX);
 
 		int error;
 
 		this->handle = pa_simple_new(
-				nullptr, // Use the default server.
-				"audout", // Our application's name.
-				PA_STREAM_PLAYBACK,
-				nullptr, // Use the default device.
-				"sound stream", // Description of our stream.
-				&ss, // our sample format.
-				&cm, // channel map
-				&ba, // buffering attributes.
-				&error
-			);
+			nullptr, // Use the default server.
+			"audout", // Our application's name.
+			PA_STREAM_PLAYBACK,
+			nullptr, // Use the default device.
+			"sound stream", // Description of our stream.
+			&ss, // our sample format.
+			&cm, // channel map
+			&ba, // buffering attributes.
+			&error
+		);
 
-		if(!this->handle){
-			LOG([&](auto&o){o << "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl;})
+		if (!this->handle) {
+			LOG([&](auto& o) {
+				o << "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl;
+			})
 			std::stringstream ss;
 			ss << "error opening PulseAudio connection: " << pa_strerror(error);
 			throw std::runtime_error(ss.str());
 		}
-		
+
 		this->start();
 	}
-	
-	virtual ~audio_backend()noexcept{
+
+	virtual ~audio_backend() noexcept
+	{
 		this->quit();
 		this->join();
-		
+
 		ASSERT(this->handle)
 		pa_simple_free(this->handle);
 	}
 };
 
-}
+} // namespace

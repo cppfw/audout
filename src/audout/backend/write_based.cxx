@@ -26,59 +26,58 @@ SOFTWARE.
 
 #pragma once
 
-#include <vector>
 #include <thread>
+#include <vector>
 
-#include <nitki/queue.hpp>
 #include <nitki/loop_thread.hpp>
+#include <nitki/queue.hpp>
 
 #include "../player.hpp"
 
-namespace{
+namespace {
 
-class write_based : public nitki::loop_thread{
+class write_based : public nitki::loop_thread
+{
 	audout::listener* listener;
-	
+
 	std::vector<std::int16_t> playBuf;
 
 protected:
 	bool isPaused = true;
-	
-	write_based(
-			audout::listener* listener,
-			size_t playBufSizeInSamples
-		) :
-			nitki::loop_thread(0),
-			listener(listener),
-			playBuf(playBufSizeInSamples)
+
+	write_based(audout::listener* listener, size_t playBufSizeInSamples) :
+		nitki::loop_thread(0),
+		listener(listener),
+		playBuf(playBufSizeInSamples)
 	{}
-	
+
 	virtual void write(const utki::span<int16_t> buf) = 0;
-	
+
 public:
-	virtual ~write_based()noexcept{}
-	
+	virtual ~write_based() noexcept {}
+
 private:
-	
-	std::optional<uint32_t> on_loop()override{
-		if(this->isPaused){
+	std::optional<uint32_t> on_loop() override
+	{
+		if (this->isPaused) {
 			return {};
 		}
 
 		this->listener->fill(utki::make_span(this->playBuf));
 
-		// this call will block if play buffer is full			
+		// this call will block if play buffer is full
 		this->write(utki::make_span(this->playBuf));
 
 		return 0;
 	}
-	
+
 public:
-	void setPaused(bool pause){
-		this->push_back([this, pause](){
+	void setPaused(bool pause)
+	{
+		this->push_back([this, pause]() {
 			this->isPaused = pause;
 		});
 	}
 };
 
-}
+} // namespace
