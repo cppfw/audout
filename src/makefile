@@ -24,7 +24,7 @@ else ifeq ($(os), windows)
     this_ldlibs += -l nitki$(this_dbg)
     this_ldlibs += -l opros$(this_dbg)
 
-    this_ldlibs += -ldsound
+    this_ldlibs += -l dsound
 else ifeq ($(os), macosx)
     this_ldlibs += -framework AudioUnit
 endif

@@ -11,7 +11,9 @@ Build-Depends:
 	libc6-dev,
 	libpulse-dev,
 	libutki-dev,
-	libnitki-dev
+	libnitki-dev,
+	clang-format,
+	clang-tidy
 Build-Depends-Indep: doxygen
 Standards-Version: 3.9.2
 
