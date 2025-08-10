@@ -28,6 +28,7 @@ SOFTWARE.
 
 #include <AudioUnit/AudioUnit.h>
 #include <utki/config.hpp>
+#include <utki/debug.hpp>
 #include <utki/destructable.hpp>
 
 #include "../format.hpp"
