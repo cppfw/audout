@@ -1,3 +1,9 @@
+libaudout (0.3.48) unstable; urgency=medium
+
+  * debian trixie build
+
+ -- Ivan Gagis <igagis@gmail.com>  Mon, 11 Aug 2025 01:29:42 +0300
+
 libaudout (0.3.47) unstable; urgency=medium
 
   * add debian dbg package
