@@ -184,12 +184,10 @@ class audio_backend : public utki::destructable
 
 			// fill the second buffer to be enqueued next time the callback is called
 			ASSERT(player->bufs[1].size() % 2 == 0)
-			player->backend.listener->fill(
-				utki::span<std::int16_t>(
-					reinterpret_cast<std::int16_t*>(&*player->bufs[1].begin()),
-					player->bufs[1].size() / 2
-				)
-			);
+			player->backend.listener->fill(utki::span<std::int16_t>(
+				reinterpret_cast<std::int16_t*>(&*player->bufs[1].begin()),
+				player->bufs[1].size() / 2
+			));
 		}
 
 		Player(

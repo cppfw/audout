@@ -34,16 +34,24 @@ SOFTWARE.
 
 namespace audout {
 
-//TODO: doxygen
+// TODO: doxygen
 class listener
 {
 public:
 	virtual void fill(utki::span<int16_t> play_buffer) noexcept = 0;
 
-	virtual ~listener() noexcept {}
+	listener() = default;
+
+	listener(const listener&) = delete;
+	listener& operator=(const listener&) = delete;
+
+	listener(listener&&) = delete;
+	listener& operator=(listener&&) = delete;
+
+	virtual ~listener() = default;
 };
 
-//TODO: doxygen
+// TODO: doxygen
 class player : public utki::intrusive_singleton<player>
 {
 	friend class utki::intrusive_singleton<player>;
@@ -59,10 +67,20 @@ public:
 	 *                            the size of the resulting buffer will be equal to this requested value.
 	 * @param listener - callback for filling playing buffer.
 	 */
-	player(format output_format, uint32_t num_buffer_frames, listener* listener);
+	player(
+		format output_format, //
+		uint32_t num_buffer_frames,
+		listener* listener
+	);
 
 public:
-	virtual ~player() noexcept {}
+	player(const player&) = delete;
+	player& operator=(const player&) = delete;
+
+	player(player&&) = delete;
+	player& operator=(player&&) = delete;
+
+	~player() override = default;
 
 	void set_paused(bool pause);
 };

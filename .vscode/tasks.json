@@ -13,9 +13,9 @@
 			"group": "build"
 		},
 		{
-			"label": "build_dbg",
+			"label": "build_dev",
 			"type": "shell",
-			"command": "make config=dbg",
+			"command": "make config=dev",
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -31,9 +31,9 @@
 			"group": "build"
 		},
 		{
-			"label": "test_dbg",
+			"label": "test_dev",
 			"type": "shell",
-			"command": "make test config=dbg",
+			"command": "make test config=dev",
 			"problemMatcher": [
 				"$gcc"
 			],
@@ -43,6 +43,20 @@
 			"label": "clean-all",
 			"type": "shell",
 			"command": "make clean-all",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "format",
+			"type": "shell",
+			"command": "make format",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "lint",
+			"type": "shell",
+			"command": "make config=lint && make config=lint test",
 			"problemMatcher": [],
 			"group": "build"
 		}

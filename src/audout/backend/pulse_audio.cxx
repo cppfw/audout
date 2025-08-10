@@ -30,19 +30,20 @@ SOFTWARE.
 #include <pulse/simple.h>
 #include <utki/destructable.hpp>
 
+// NOLINTNEXTLINE(bugprone-suspicious-include, "not a suspicious include")
 #include "write_based.cxx"
 
 namespace {
 
-class audio_backend : public write_based, public utki::destructable
+class audio_backend :
+	public write_based, //
+	public utki::destructable
 {
 	pa_simple* handle;
 
 	void write(const utki::span<std::int16_t> buf) override
 	{
-		//		ASSERT(buf.Size() == this->BufferSizeInBytes())
-
-		int error;
+		int error{};
 
 		if (pa_simple_write(this->handle, &*buf.begin(), size_t(buf.size_bytes()), &error) < 0) {
 			LOG([&](auto& o) {
@@ -52,22 +53,25 @@ class audio_backend : public write_based, public utki::destructable
 	}
 
 public:
-	audio_backend(audout::format outputFormat, uint32_t bufferSizeFrames, audout::listener* listener) :
-		write_based(listener, bufferSizeFrames * outputFormat.num_channels())
+	audio_backend(audout::format output_format, uint32_t buffer_size_frames, audout::listener* listener) :
+		write_based(
+			listener, //
+			size_t(buffer_size_frames * output_format.num_channels())
+		)
 	{
 		LOG([&](auto& o) {
 			o << "opening device" << std::endl;
 		})
 
 		pa_sample_spec ss;
-		ss.format = PA_SAMPLE_S16NE; //Native endian
-		ss.channels = outputFormat.num_channels();
-		ss.rate = outputFormat.frequency();
+		ss.format = PA_SAMPLE_S16NE; // native endian
+		ss.channels = output_format.num_channels();
+		ss.rate = output_format.frequency();
 
-		unsigned bufferSizeInBytes = bufferSizeFrames * outputFormat.frame_size();
+		unsigned buffer_size_bytes = buffer_size_frames * output_format.frame_size();
 		pa_buffer_attr ba;
-		ba.fragsize = bufferSizeInBytes;
-		ba.tlength = bufferSizeInBytes;
+		ba.fragsize = buffer_size_bytes;
+		ba.tlength = buffer_size_bytes;
 		ba.minreq = std::uint32_t(-1);
 		ba.maxlength = std::uint32_t(-1);
 		ba.prebuf = std::uint32_t(-1);
@@ -75,7 +79,7 @@ public:
 		pa_channel_map cm;
 		pa_channel_map_init_auto(&cm, ss.channels, PA_CHANNEL_MAP_WAVEEX);
 
-		int error;
+		int error{};
 
 		this->handle = pa_simple_new(
 			nullptr, // Use the default server.
@@ -90,9 +94,9 @@ public:
 		);
 
 		if (!this->handle) {
-			LOG([&](auto& o) {
+			utki::log_debug([&](auto& o) {
 				o << "error opening PulseAudio connection (" << pa_strerror(error) << ")" << std::endl;
-			})
+			});
 			std::stringstream ss;
 			ss << "error opening PulseAudio connection: " << pa_strerror(error);
 			throw std::runtime_error(ss.str());
@@ -101,12 +105,18 @@ public:
 		this->start();
 	}
 
-	virtual ~audio_backend() noexcept
+	audio_backend(const audio_backend&) = delete;
+	audio_backend& operator=(const audio_backend&) = delete;
+
+	audio_backend(audio_backend&&) = delete;
+	audio_backend& operator=(audio_backend&&) = delete;
+
+	~audio_backend() override
 	{
 		this->quit();
 		this->join();
 
-		ASSERT(this->handle)
+		utki::assert(this->handle, SL);
 		pa_simple_free(this->handle);
 	}
 };
