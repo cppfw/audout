@@ -45,6 +45,10 @@ SOFTWARE.
 #	error "Unknown OS"
 #endif
 
+#ifdef assert
+#	undef assert
+#endif
+
 using namespace audout;
 
 utki::intrusive_singleton<player>::instance_type player::instance = nullptr;
