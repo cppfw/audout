@@ -317,7 +317,7 @@ class audio_backend : public utki::destructable
 	}
 
 public:
-	void setPaused(bool pause)
+	void set_paused(bool pause)
 	{
 		if (pause) {
 			this->dsb.dsb->Stop();
@@ -365,7 +365,7 @@ public:
 		});
 
 		// launch buffer playing
-		this->setPaused(false);
+		this->set_paused(false);
 	}
 
 	~audio_backend() noexcept

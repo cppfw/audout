@@ -315,7 +315,7 @@ class audio_backend : public utki::destructable
 			(*this->object)->Destroy(this->object);
 		}
 
-		void setPaused(bool pause)
+		void set_paused(bool pause)
 		{
 			SLresult res;
 			if (pause) {
@@ -335,9 +335,9 @@ class audio_backend : public utki::destructable
 	} player;
 
 public:
-	void setPaused(bool pause)
+	void set_paused(bool pause)
 	{
-		this->player.setPaused(pause);
+		this->player.set_paused(pause);
 	}
 
 	// create buffered queue player
@@ -347,7 +347,7 @@ public:
 		player(*this, this->engine, this->outputMix, bufferSizeFrames, outputFormat)
 	{
 		//		TRACE(<< "audio_backend::audio_backend(): Starting player" << std::endl)
-		this->setPaused(false);
+		this->set_paused(false);
 
 		// enqueue the first buffer for playing, otherwise it will not start playing
 #if CFG_OS_NAME == CFG_OS_NAME_ANDROID

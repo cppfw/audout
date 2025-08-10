@@ -138,15 +138,15 @@ public:
 			throw std::runtime_error("Unable to attach an IOProc to the selected audio unit");
 		}
 
-		this->setPaused(false);
+		this->set_paused(false);
 	}
 
 	~audio_backend() noexcept
 	{
-		this->setPaused(true);
+		this->set_paused(true);
 	}
 
-	void setPaused(bool paused)
+	void set_paused(bool paused)
 	{
 		if (paused) {
 			AudioOutputUnitStop(this->audioComponent.instance);
