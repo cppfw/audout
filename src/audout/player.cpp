@@ -27,6 +27,7 @@ SOFTWARE.
 #include "player.hpp"
 
 #include <utki/config.hpp>
+#include <utki/debug.hpp>
 
 #if CFG_OS == CFG_OS_WINDOWS
 #	include "backend/direct_sound.cxx"
