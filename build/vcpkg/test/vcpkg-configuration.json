@@ -12,7 +12,8 @@
         "reference": "main",
         "packages": [
           "myci",
-          "utki"
+          "utki",
+          "nitki"
         ]
       }
     ],
