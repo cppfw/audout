@@ -20,7 +20,7 @@
       "utki",
       {
         "name": "nitki",
-        "platform": "linux"
+        "platform": "linux | windows"
       }
     ]
   }

@@ -22,6 +22,8 @@ myci_declare_library(${PROJECT_NAME}
         ../../src/${PROJECT_NAME}
     DEPENDENCIES
         utki
+    WINDOWS_ONLY_DEPENDENCIES
+        nitki
     LINUX_ONLY_DEPENDENCIES
         nitki
         PkgConfig::libpulse-simple
