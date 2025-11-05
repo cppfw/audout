@@ -32,6 +32,10 @@ SOFTWARE.
 
 #include "../format.hpp"
 
+#ifdef assert
+#	undef assert
+#endif
+
 namespace {
 
 class audio_backend : public utki::destructable
@@ -83,7 +87,7 @@ class audio_backend : public utki::destructable
 		for (unsigned i = 0; i != ioData->mNumberBuffers; ++i) {
 			auto& buf = ioData->mBuffers[i];
 			//			TRACE(<< "num channels = " << buf.mNumberChannels << std::endl)
-			ASSERT(buf.mDataByteSize % sizeof(std::int16_t) == 0)
+			utki::assert(buf.mDataByteSize % sizeof(std::int16_t) == 0, SL);
 			listener->fill(
 				utki::make_span(reinterpret_cast<std::int16_t*>(buf.mData), buf.mDataByteSize / sizeof(std::int16_t))
 			);
