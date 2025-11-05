@@ -411,7 +411,8 @@ jobs:
       with: {name: VCPKG_ROOT, value: "C:/vcpkg/"}
     - name: make local symbolic link to VCPKG installation directory
       # this is needed at least for actions/upload-artifact to be able to find vcpkg install logs
-      run: mklink /D vcpkg-installation $env:VCPKG_ROOT
+      shell: powershell
+      run: New-Item -ItemType SymbolicLink -Path vcpkg-installation -Target $env:VCPKG_ROOT
     - name: prepare vcpkg port
       run: myci-vcpkg-prepare.ps1 -gitref ${{ github.sha }}
     - name: test vcpkg port
