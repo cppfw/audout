@@ -23,5 +23,6 @@ myci_declare_library(${PROJECT_NAME}
     DEPENDENCIES
         utki
     LINUX_ONLY_DEPENDENCIES
+        nitki
         PkgConfig::libpulse-simple
 )
