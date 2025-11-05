@@ -31,6 +31,8 @@ myci_declare_library(${PROJECT_NAME}
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE dsound)
+elseif(IOS)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AudioToolbox")
 elseif(APPLE) # macos and ios
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AudioUnit")
 endif()
