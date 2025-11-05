@@ -494,7 +494,7 @@ jobs:
       with:
         name: vcpkg_windows_logs
         path: |
-          vcpkg-installation/buildtrees/${{ env.PACKAGE_NAME }}/
+          C:/vcpkg/buildtrees/${{ env.PACKAGE_NAME }}/
           build/vcpkg/**/*.log
 ##### vcpkg-macos #####
   vcpkg-macos:
