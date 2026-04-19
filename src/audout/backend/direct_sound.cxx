@@ -161,7 +161,7 @@ class audio_backend : public utki::destructable
 			WAVEFORMATEX wf;
 			memset(&wf, 0, sizeof(WAVEFORMATEX));
 
-			wf.nChannels = format.num_channels();
+			wf.nChannels = WORD(format.num_channels());
 			wf.nSamplesPerSec = format.frequency();
 
 			wf.wFormatTag = WAVE_FORMAT_PCM;
