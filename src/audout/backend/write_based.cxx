@@ -83,7 +83,7 @@ private:
 public:
 	void set_paused(bool pause)
 	{
-		this->push_back([this, pause]() {
+		this->push([this, pause]() {
 			this->is_paused = pause;
 		});
 	}
