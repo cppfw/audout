@@ -82,8 +82,9 @@ public:
 	 */
 	format(
 		// TODO: rename to frame_kind or frame_layout
-		frame frame_type,//
-		rate sampling_rate) :
+		frame frame_type, //
+		rate sampling_rate
+	) :
 		frame_type(frame_type),
 		sampling_rate(sampling_rate)
 	{}
