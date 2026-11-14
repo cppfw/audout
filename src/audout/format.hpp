@@ -26,20 +26,31 @@ SOFTWARE.
 
 #pragma once
 
-// TODO: doxygen all
-
 namespace audout {
 
+/**
+ * @brief Audio frame layout.
+ * review: number of audio channels
+ */
 enum class frame {
 	mono = 1,
 	stereo = 2
 };
 
+/**
+ * @brief Get number of audio channels for the given frame layout.
+ * @param frame_type - frame layout.
+ * @return number of audio channels for the given frame layout.
+ */
 constexpr inline unsigned num_channels(frame frame_type) noexcept
 {
 	return unsigned(frame_type);
 }
 
+/**
+ * @brief Audio sampling rate.
+ * review: in Hz
+ */
 enum class rate {
 	hz_11025 = 11025,
 	hz_22050 = 22050,
@@ -47,28 +58,59 @@ enum class rate {
 	hz_48000 = 48000
 };
 
+/**
+ * @brief Audio output format.
+ */
 class format
 {
 public:
+	/**
+	 * @brief Frame layout.
+	 */
+	// TODO: rename to frame_kind or frame_layout
 	frame frame_type;
 
+	/**
+	 * @brief Sampling rate.
+	 */
 	rate sampling_rate;
 
-	format(frame frame_type, rate sampling_rate) :
+	/**
+	 * @brief Constructor.
+	 * @param frame_type - frame layout.
+	 * @param sampling_rate - sampling rate.
+	 */
+	format(
+		// TODO: rename to frame_kind or frame_layout
+		frame frame_type,//
+		rate sampling_rate) :
 		frame_type(frame_type),
 		sampling_rate(sampling_rate)
 	{}
 
+	/**
+	 * @brief Get number of audio channels.
+	 * @return number of audio channels for this format.
+	 */
 	unsigned num_channels() const noexcept
 	{
 		return audout::num_channels(this->frame_type);
 	}
 
+	/**
+	 * @brief Get sampling frequency.
+	 * @return sampling frequency in hertz.
+	 */
+	// TODO: rename to sampling_rate_hz
 	unsigned frequency() const noexcept
 	{
 		return unsigned(this->sampling_rate);
 	}
 
+	/**
+	 * @brief Get size of a single audio frame in bytes.
+	 * @return size of a single audio frame in bytes.
+	 */
 	unsigned frame_size() const noexcept
 	{
 		return 2 * this->num_channels();

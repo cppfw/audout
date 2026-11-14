@@ -34,12 +34,22 @@ SOFTWARE.
 
 namespace audout {
 
-// TODO: doxygen
+/**
+ * @brief Listener which fills the playing buffer with audio data.
+ * review: invoked when playing buffer needs more data to play
+ */
 class listener
 {
 public:
+	/**
+	 * @brief Fill the playing buffer with audio data.
+	 * @param play_buffer - buffer to be filled with audio data.
+	 */
 	virtual void fill(utki::span<int16_t> play_buffer) noexcept = 0;
 
+	/**
+	 * @brief Default constructor.
+	 */
 	listener() = default;
 
 	listener(const listener&) = delete;
@@ -48,10 +58,15 @@ public:
 	listener(listener&&) = delete;
 	listener& operator=(listener&&) = delete;
 
+	/**
+	 * @brief Destructor.
+	 */
 	virtual ~listener() = default;
 };
 
-// TODO: doxygen
+/**
+ * @brief Audio player singleton.
+ */
 class player : public utki::intrusive_singleton<player>
 {
 	friend class utki::intrusive_singleton<player>;
@@ -80,8 +95,15 @@ public:
 	player(player&&) = delete;
 	player& operator=(player&&) = delete;
 
+	/**
+	 * @brief Destructor.
+	 */
 	~player() override = default;
 
+	/**
+	 * @brief Set player to paused or resumed state.
+	 * @param pause - true to pause the player, false to resume it.
+	 */
 	void set_paused(bool pause);
 };
 
