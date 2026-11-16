@@ -27,7 +27,7 @@ struct sine_player : public audout::listener {
 			);
 			this->time += 1 / decltype(this->time)(format.frequency());
 			for (unsigned i = 0; i != format.num_channels(); ++i) {
-				ASSERT(utki::overlaps(buf, dst))
+				utki::assert(utki::overlaps(buf, dst), SL);
 				*dst = v;
 				++dst;
 			}
